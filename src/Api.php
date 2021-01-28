@@ -8,6 +8,7 @@
 namespace SeattleWebCo\WCZoom;
 
 use \Firebase\JWT\JWT;
+use GuzzleHttp\Client;
 
 /**
  * Api class.
@@ -34,9 +35,26 @@ class Api {
 		$decoded = JWT::decode( $jwt, $key, array( 'HS256' ) );
 
 		if ( ! is_admin() ) {
-			print 123;
-			var_dump( $jwt );
-			print_r( $decoded );
+			$client = new Client(
+				array(
+					// Base URI is used with relative requests
+					'base_uri' => 'https://api.zoom.us/v2',
+					// You can set any number of default request options.
+					'timeout'  => 2.0,
+				)
+			);
+
+			$response = $client->request(
+				'GET',
+				'/users',
+				array(
+					'headers' => array(
+						'authorization' => 'Bearer ' . $jwt,
+					),
+				)
+			);
+
+			var_dump( $response->getBody() );
 		}
 
 		/*
