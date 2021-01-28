@@ -2,8 +2,16 @@
   "name": "wc-zoom",
   "version": "0.0.0-development",
   "description": "Sell virtual Zoom webinars with WooCommerce",
-  "repository": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seattlewebco/wc-zoom.git"
+  },
   "author": "Seattle Web Co.",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/seattlewebco/wc-zoom/issues"
+  },
+  "homepage": "https://github.com/seattlewebco/wc-zoom#readme",
   "dependencies": {},
   "devDependencies": {
     "@babel/plugin-transform-classes": "^7.9.5",

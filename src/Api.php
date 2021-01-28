@@ -14,6 +14,9 @@ use \Firebase\JWT\JWT;
  */
 class Api {
 
+	/**
+	 * Testing
+	 */
 	public function __construct() {
 		$key     = defined( 'WC_ZOOM_API_SECRET' ) ? constant( 'WC_ZOOM_API_SECRET' ) : '';
 		$payload = array(
