@@ -4,6 +4,7 @@
 
 	<file>wc-zoom.php</file>
 	<file>src/.</file>
+	<file>includes/.</file>
 
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>

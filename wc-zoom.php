@@ -22,7 +22,65 @@ define( 'WC_ZOOM_BASE', __FILE__ );
 
 require_once 'vendor/autoload.php';
 
-new Api();
+require_once 'includes/wc-zoom-integration-settings.php';
+
+$GLOBALS['wc_zoom'] = new Api(
+	new Zoom(
+		array(
+			'timeout' => 30,
+		)
+	)
+);
+
+session_start();
+
+add_action(
+	'wp_loaded',
+	function() {
+		global $wc_zoom;
+
+		if ( ! isset( $_GET['wc-zoom-oauth'] ) ) {
+			return;
+		}
+
+		if ( empty( $_GET['state'] ) || ( isset( $_SESSION['oauth2state'] ) && $_GET['state'] !== $_SESSION['oauth2state'] ) ) {
+
+			if ( isset( $_SESSION['oauth2state'] ) ) {
+				unset( $_SESSION['oauth2state'] );
+			}
+
+			exit( 'Invalid state' );
+
+		} else {
+
+			try {
+				$access_token = $wc_zoom->provider->getAccessToken(
+					'authorization_code',
+					array(
+						// phpcs:ignore
+						'code' => sanitize_text_field( wp_unslash( $_GET['code'] ) ),
+					)
+				);
+
+				$wc_zoom->update_access_token( $access_token );
+
+			} catch ( \Exception $e ) {
+				wp_die( esc_html( $e->getMessage() ) );
+			}
+		}
+	}
+);
+
+/*
+add_action(
+	'wp_body_open',
+	function() {
+		$api = new Api();
+
+		var_dump( $api->get_webinars( 'oDbOKoF3TPKPHTE-Et_pHQ' ) );
+	}
+);
+*/
 
 /**
  * Activation hook

@@ -7,8 +7,8 @@
 
 namespace SeattleWebCo\WCZoom;
 
-use \Firebase\JWT\JWT;
-use GuzzleHttp\Client;
+use League\OAuth2\Client\Provider\AbstractProvider;
+use League\OAuth2\Client\Token\AccessToken;
 
 /**
  * Api class.
@@ -16,53 +16,54 @@ use GuzzleHttp\Client;
 class Api {
 
 	/**
-	 * Testing
+	 * Base API endpoint.
+	 *
+	 * @var string
 	 */
-	public function __construct() {
-		$key     = defined( 'WC_ZOOM_API_SECRET' ) ? constant( 'WC_ZOOM_API_SECRET' ) : '';
-		$payload = array(
-			'iss'   => defined( 'WC_ZOOM_API_KEY' ) ? constant( 'WC_ZOOM_API_KEY' ) : '',
-			'exp'   => time() + 30,
+	public $base_uri = 'https://api.zoom.us/v2';
+
+	public $provider;
+
+	public function __construct( AbstractProvider $provider ) {
+		$this->provider = $provider;
+	}
+
+	public function update_access_token( AccessToken $access_token ) {
+		update_option(
+			'wc_zoom_oauth_tokens',
+			$access_token->jsonSerialize()
 		);
 
-		/**
-		 * IMPORTANT:
-		 * You must specify supported algorithms for your application. See
-		 * https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40
-		 * for a list of spec-compliant algorithms.
-		 */
-		$jwt     = JWT::encode( $payload, $key );
-		$decoded = JWT::decode( $jwt, $key, array( 'HS256' ) );
+		return $access_token;
+	}
 
-		if ( ! is_admin() ) {
-			$client = new Client(
-				array(
-					// Base URI is used with relative requests
-					'base_uri' => 'https://api.zoom.us/v2',
-					// You can set any number of default request options.
-					'timeout'  => 2.0,
-				)
-			);
+	private function get_access_token() {
+		$tokens = get_option( 'wc_zoom_oauth_tokens', array() );
 
-			$response = $client->request(
-				'GET',
-				'/users',
-				array(
-					'headers' => array(
-						'authorization' => 'Bearer ' . $jwt,
-					),
-				)
-			);
-
-			var_dump( $response->getBody() );
+		if ( empty( $tokens['access_token'] ) || empty( $tokens['refresh_token'] ) || empty( $tokens['expires'] ) ) {
+			return null;
 		}
 
-		/*
-		NOTE: This will now be an object instead of an associative array. To get
-		an associative array, you will need to cast it as such:
-		*/
+		if ( $tokens['expires'] <= time() ) {
+			$access_token = $this->provider->getAccessToken( 'refresh_token', array( 'refresh_token' => $tokens['refresh_token'] ) );
 
-		$decoded_array = (array) $decoded;
+			error_log( print_r( $access_token, true ) );
+
+			return $this->update_access_token( $access_token );
+		}
+
+		return new AccessToken( $tokens );
+	}
+
+	public function get_me() {
+		$request = $this->provider->getAuthenticatedRequest(
+			'GET',
+			$this->base_uri . '/users/me',
+			$this->get_access_token(),
+		);
+
+		return $this->provider->getParsedResponse( $request );
+
 	}
 
 }
