@@ -80,17 +80,6 @@ add_action(
 	}
 );
 
-/*
-add_action(
-	'wp_body_open',
-	function() {
-		$api = new Api();
-
-		var_dump( $api->get_webinars( 'oDbOKoF3TPKPHTE-Et_pHQ' ) );
-	}
-);
-*/
-
 /**
  * Activation hook
  */
