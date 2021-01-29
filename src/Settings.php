@@ -15,12 +15,18 @@ class Settings extends \WC_Integration {
 	public function __construct() {
 		$this->id                 = 'wc_zoom';
 		$this->method_title       = __( 'Zoom', 'wc-zoom' );
-		$this->method_description = __( 'An integration for utilizing MaxMind to do Geolocation lookups. Please note that this integration will only do country lookups.', 'wc-zoom' );
+		$this->method_description = __( 'Integrate Zoom with WooCommerce to ease selling webinars seamlessly.', 'wc-zoom' );
 
 		$this->init_form_fields();
 		$this->init_settings();
 
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
 		add_action( 'admin_post_wc_zoom_oauth', array( $this, 'process_authorization' ) );
+	}
+
+	public function enqueue_scripts() {
+		wp_enqueue_style( 'wc-zoom', WC_ZOOM_URL . 'assets/css/admin.css' );
 	}
 
 	public function process_authorization() {
@@ -39,16 +45,44 @@ class Settings extends \WC_Integration {
 	}
 
 	public function admin_options() {
-		global $wc_zoom;
-
-		var_dump( $wc_zoom->get_me() );
 		?>
 
 		<p>
-			<a href="<?php echo esc_url( add_query_arg( array( 'action' => 'wc_zoom_oauth' ), wp_nonce_url( admin_url( 'admin-post.php' ), 'wc-zoom-oauth' ) ) ); ?>"><?php esc_html_e( 'Authorize', 'wc-zoom' ); ?></a>
+			<?php $this->authorize_zoom_button(); ?>
 		</p>
 
-
 		<?php
+	}
+
+	public function authorize_zoom_button() {
+		global $wc_zoom;
+
+		$me = $wc_zoom->get_me();
+
+		if ( empty( $me['id'] ) ) {
+			?>
+
+			<p>
+				<a class="button zoom-button" href="<?php echo esc_url( add_query_arg( array( 'action' => 'wc_zoom_oauth' ), wp_nonce_url( admin_url( 'admin-post.php' ), 'wc-zoom-oauth' ) ) ); ?>">
+					<?php esc_html_e( 'Authorize with', 'wc-zoom' ); ?> 
+					<span class="zoom-icon"></span>
+				</a>
+			</p>
+
+			<?php
+		} else {
+			?>
+
+			<p>
+				<?php printf( __( 'Connected to account: %s', 'wc-zoom' ), esc_html( $me['first_name'] . ' ' . $me['last_name'] ) ); ?>
+			</p>
+			<p>
+				<a class="disconnect-wc-zoom" href="#">
+					<?php esc_html_e( 'Revoke Zoom Authorization', 'wc-zoom' ); ?>
+				</a> 
+			</p>
+
+			<?php
+		}
 	}
 }

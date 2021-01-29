@@ -23,6 +23,8 @@ define( 'WC_ZOOM_BASE', __FILE__ );
 require_once 'vendor/autoload.php';
 
 require_once 'includes/wc-zoom-integration-settings.php';
+require_once 'includes/wc-zoom-product-meta-boxes.php';
+require_once 'includes/wc-zoom-markup-functions.php';
 
 $GLOBALS['wc_zoom'] = new Api(
 	new Zoom(
@@ -42,6 +44,8 @@ add_action(
 		if ( ! isset( $_GET['wc-zoom-oauth'] ) ) {
 			return;
 		}
+
+		delete_option( 'wc_zoom_user_id' );
 
 		if ( empty( $_GET['state'] ) || ( isset( $_SESSION['oauth2state'] ) && $_GET['state'] !== $_SESSION['oauth2state'] ) ) {
 
@@ -64,6 +68,11 @@ add_action(
 
 				$wc_zoom->update_access_token( $access_token );
 
+				$me = $wc_zoom->get_me();
+
+				if ( ! empty( $me['id'] ) ) {
+					update_option( 'wc_zoom_user_id', $me['id'] );
+				}
 			} catch ( \Exception $e ) {
 				wp_die( esc_html( $e->getMessage() ) );
 			}

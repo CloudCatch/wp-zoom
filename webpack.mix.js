@@ -10,6 +10,7 @@
 
 // Import required packages.
 const mix = require('laravel-mix');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 require('laravel-mix-polyfill');
 require('laravel-mix-svg-sprite');
@@ -123,7 +124,13 @@ mix.webpackConfig({
     stats: 'minimal',
     devtool: 'none',
     performance: {hints: false},
-    externals: {jquery: 'jQuery'}
+    externals: {jquery: 'jQuery'},
+    plugins: [
+        // @link https://github.com/webpack-contrib/copy-webpack-plugin
+        new CopyWebpackPlugin([
+            {from: `${devPath}/fonts`, to: `${distPath}/fonts`}
+        ]),
+    ]
 });
 
 if (process.env.sync) {
