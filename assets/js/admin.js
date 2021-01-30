@@ -93,7 +93,9 @@
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-
+(function ($) {
+  $('.woocommerce_options_panel #_wc_zoom_webinars').selectWoo();
+})(jQuery);
 
 /***/ }),
 
@@ -108,15 +110,27 @@
 
 /***/ }),
 
+/***/ "./resources/scss/frontend.scss":
+/*!**************************************!*\
+  !*** ./resources/scss/frontend.scss ***!
+  \**************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
 /***/ 0:
-/*!*****************************************************************!*\
-  !*** multi ./resources/js/admin.js ./resources/scss/admin.scss ***!
-  \*****************************************************************/
+/*!************************************************************************************************!*\
+  !*** multi ./resources/js/admin.js ./resources/scss/admin.scss ./resources/scss/frontend.scss ***!
+  \************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(/*! /Users/david/Workspace/sandbox.local/www/wp-content/plugins/wc-zoom/resources/js/admin.js */"./resources/js/admin.js");
-module.exports = __webpack_require__(/*! /Users/david/Workspace/sandbox.local/www/wp-content/plugins/wc-zoom/resources/scss/admin.scss */"./resources/scss/admin.scss");
+__webpack_require__(/*! /Users/david/Workspace/sandbox.local/www/wp-content/plugins/wc-zoom/resources/scss/admin.scss */"./resources/scss/admin.scss");
+module.exports = __webpack_require__(/*! /Users/david/Workspace/sandbox.local/www/wp-content/plugins/wc-zoom/resources/scss/frontend.scss */"./resources/scss/frontend.scss");
 
 
 /***/ })

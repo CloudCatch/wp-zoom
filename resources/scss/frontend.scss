@@ -1,0 +1,19 @@
+.wc-zoom-webinar-field {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: flex-start;
+	margin: 0 0 1em;
+
+	label {
+		font-weight: bold;
+	}
+
+	select {
+		max-width: 100%;
+	}
+
+	.wc-zoom-webinar-field-date {
+		max-width: 100%;
+	}
+}

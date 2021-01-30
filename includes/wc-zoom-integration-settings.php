@@ -5,6 +5,11 @@
  * @package SeattleWebCo\WCZoom
  */
 
+/**
+ * Init plugin settings under WooCommerce integrations
+ *
+ * @return void
+ */
 function wc_zoom_load_integration() {
 	if ( class_exists( '\WC_Integration' ) ) {
 		add_filter(

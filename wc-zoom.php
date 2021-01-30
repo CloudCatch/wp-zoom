@@ -17,14 +17,18 @@ namespace SeattleWebCo\WCZoom;
 
 define( 'WC_ZOOM_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WC_ZOOM_URL', plugin_dir_url( __FILE__ ) );
+define( 'WC_ZOOM_VER', get_plugin_data( __FILE__ )['Version'] ?? '1.0.0' );
 define( 'WC_ZOOM_DB_VER', '1.0.0' );
 define( 'WC_ZOOM_BASE', __FILE__ );
 
 require_once 'vendor/autoload.php';
 
+require_once 'includes/wc-zoom-enqueue-scripts.php';
 require_once 'includes/wc-zoom-integration-settings.php';
 require_once 'includes/wc-zoom-product-meta-boxes.php';
+require_once 'includes/wc-zoom-markup-products.php';
 require_once 'includes/wc-zoom-markup-functions.php';
+require_once 'includes/wc-zoom-helper-functions.php';
 
 $GLOBALS['wc_zoom'] = new Api(
 	new Zoom(

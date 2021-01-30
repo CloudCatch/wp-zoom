@@ -108,6 +108,17 @@ mix
             }]
         })
     ]
+})
+    .sass(`${devPath}/scss/frontend.scss`, `${distPath}/css/frontend.css`, sassConfig).options({
+    postCss: [
+        require('cssnano')({
+            preset: ['default', {
+                discardComments: {
+                    removeAll: true,
+                },
+            }]
+        })
+    ]
 });
 
 /*

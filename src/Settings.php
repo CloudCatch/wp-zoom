@@ -23,10 +23,13 @@ class Settings extends \WC_Integration {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
 		add_action( 'admin_post_wc_zoom_oauth', array( $this, 'process_authorization' ) );
+
+		add_action( 'admin_init', array( $this, 'purge_cache' ) );
 	}
 
 	public function enqueue_scripts() {
 		wp_enqueue_style( 'wc-zoom', WC_ZOOM_URL . 'assets/css/admin.css' );
+		wp_enqueue_script( 'wc-zoom', WC_ZOOM_URL . 'assets/js/admin.js', array( 'jquery', 'selectWoo' ), null, true );
 	}
 
 	public function process_authorization() {
@@ -36,6 +39,7 @@ class Settings extends \WC_Integration {
 			wp_die( esc_html__( 'You do not have permission to do that.', 'wc-zoom' ) );
 		}
 
+		// phpcs:ignore
 		if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'] ?? '', 'wc-zoom-oauth' ) ) {
 			wp_die( esc_html__( 'Invalid nonce, please try again.', 'wc-zoom' ) );
 		}
@@ -44,11 +48,49 @@ class Settings extends \WC_Integration {
 		exit;
 	}
 
+	public function purge_cache() {
+		global $wc_zoom;
+
+		if ( empty( $_REQUEST['purge_wc_zoom_cache'] ) ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_die( esc_html__( 'You do not have permission to do that.', 'wc-zoom' ) );
+		}
+
+		// phpcs:ignore
+		if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'] ?? '', 'wc-zoom-purge-cache' ) ) {
+			wp_die( esc_html__( 'Invalid nonce, please try again.', 'wc-zoom' ) );
+		}
+
+		Cache::delete_all();
+
+		add_action(
+			'admin_notices',
+			function() {
+				?>
+
+			<div class="notice notice-success is-dismissible">
+				<p><?php esc_html_e( 'Cache purged successfully.', 'wc-zoom' ); ?></p>
+			</div>
+
+				<?php
+			}
+		);
+	}
+
 	public function admin_options() {
 		?>
 
 		<p>
 			<?php $this->authorize_zoom_button(); ?>
+		</p>
+
+		<p>
+			<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'purge_wc_zoom_cache' => 1 ) ), 'wc-zoom-purge-cache' ) ); ?>" class="button">
+				<?php esc_html_e( 'Purge Zoom API Cache', 'wc-zoom' ); ?>
+			</a>
 		</p>
 
 		<?php
