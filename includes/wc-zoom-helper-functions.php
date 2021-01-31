@@ -54,12 +54,14 @@ function wc_zoom_product_get_webinars( $product = null ) {
 				array_walk(
 					$webinars,
 					function( &$webinar ) use ( $wc_zoom ) {
-						$webinar = $wc_zoom->get_webinar( $webinar );
+						$_webinar = $wc_zoom->get_webinar( $webinar );
+
+						$webinar = isset( $_webinar['uuid'] ) ? $_webinar : null;
 					}
 				);
 			}
 
-			return $webinars ? $webinars : array();
+			return $webinars ? array_filter( $webinars ) : array();
 		}
 	}
 

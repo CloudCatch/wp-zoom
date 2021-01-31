@@ -61,30 +61,20 @@ class Zoom extends AbstractProvider {
 		);
 	}
 
-	public function getParsedResponse( RequestInterface $request ) {
-		try {
-			$response = $this->getResponse( $request );
-		} catch ( BadResponseException $e ) {
-			$response = $e->getResponse();
-		}
-
-		$parsed = $this->parseResponse( $response );
-
-		$this->checkResponse( $response, $parsed );
-
-		return $parsed;
-	}
-
 	protected function checkResponse( ResponseInterface $response, $data ) {
 		if ( ! empty( $data[ $this->response_error ] ) ) {
 			$error = $data[ $this->response_error ];
+
 			if ( ! is_string( $error ) ) {
 				$error = var_export( $error, true );
 			}
+
 			$code = $this->response_code && ! empty( $data[ $this->response_code ] ) ? $data[ $this->response_code ] : 0;
+
 			if ( ! is_int( $code ) ) {
 				$code = intval( $code );
 			}
+
 			throw new IdentityProviderException( $error, $code, $data );
 		}
 	}

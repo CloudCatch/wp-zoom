@@ -44,7 +44,11 @@ class Cache {
 	 * @param integer $expires When to expire cached value.
 	 * @return void
 	 */
-	public static function set( $key, $value, $group = '', $expires = 3600 ) {
+	public static function set( $key, $value, $group = '', $expires = 300 ) {
+		if ( null === $value ) {
+			return;
+		}
+
 		wp_cache_set( $key, json_encode( $value ), $group, $expires );
 
 		set_transient( $key, json_encode( $value ), $expires );

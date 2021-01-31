@@ -13,8 +13,6 @@
 function wc_zoom_single_product_summary() {
 	global $webinars;
 
-	var_dump( $webinars );
-
 	if ( ! empty( $webinars ) && is_array( $webinars ) ) {
 		?>
 
@@ -94,9 +92,9 @@ function wc_zoom_add_cart_item_data( $cart_item_data, $product_id, $variation_id
 
 		foreach ( $webinars as $webinar ) {
             // phpcs:ignore
-			$occurrence_id = (string) $_POST['_wc_zoom_webinars_occurrences'][ $webinar['id'] ] ?? '';
+			$occurrence_id = $_POST['_wc_zoom_webinars_occurrences'][ $webinar['id'] ] ?? '';
 
-			$cart_item_data['wc_zoom_webinars_occurrences'][ $webinar['id'] ] = wc_zoom_get_available_webinar_occurrence( $webinar, $occurrence_id );
+			$cart_item_data['wc_zoom_webinars_occurrences'][ $webinar['id'] ] = wc_zoom_get_available_webinar_occurrence( $webinar, (string) $occurrence_id );
 		}
 	} else {
 		// If variation.
@@ -160,6 +158,11 @@ function wc_zoom_get_item_data( $item_data, $cart_item_data ) {
 			$start_time = $webinar['start_time'] ?? null;
 			$occurrence = $cart_item_data['wc_zoom_webinars_occurrences'][ $webinar['id'] ] ?? array();
 
+			// Check if webinar still exists; e.g. webinar could of been deleted and old data cached.
+			if ( ! isset( $webinar['topic'] ) ) {
+				continue;
+			}
+
 			$display = $webinar['topic'];
 
 			if ( $start_time ) {
@@ -178,3 +181,36 @@ function wc_zoom_get_item_data( $item_data, $cart_item_data ) {
 	return $item_data;
 }
 add_filter( 'woocommerce_get_item_data', 'wc_zoom_get_item_data', 10, 2 );
+
+/**
+ * Check if cart items and their webinars are still valid
+ *
+ * @return boolean|WP_Error
+ */
+function wc_zoom_check_cart_items() {
+	$return = true;
+
+	foreach ( WC()->cart->get_cart() as $cart_item_key => $values ) {
+		if ( ! isset( $values['wc_zoom_webinars'] ) ) {
+			continue;
+		}
+
+		$product = $values['data'];
+
+		$webinars    = wc_zoom_product_get_webinars( $product->get_id() );
+		$webinar_ids = wp_list_pluck( $webinars, 'id' );
+
+		foreach ( $values['wc_zoom_webinars'] as $webinar ) {
+            // phpcs:ignore
+			if ( ! in_array( $webinar['id'], $webinar_ids ) ) {
+				WC()->cart->set_quantity( $cart_item_key, 0 );
+				wc_add_notice( __( 'A product in your cart contains a webinar which has been modified or no longer exists, therefore the product was removed from your cart.', 'wc-zoom' ), 'error' );
+
+				$return = false;
+			}
+		}
+	}
+
+	return $return;
+}
+add_action( 'woocommerce_check_cart_items', 'wc_zoom_check_cart_items' );

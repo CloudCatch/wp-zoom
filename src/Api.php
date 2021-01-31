@@ -117,7 +117,7 @@ class Api {
 	 * Get all webinars
 	 *
 	 * @param boolean $cached Retrieve cached results or not.
-	 * @return string
+	 * @return array
 	 */
 	public function get_webinars( bool $cached = true ) {
 		if ( $cached ) {

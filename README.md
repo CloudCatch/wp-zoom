@@ -1,3 +1,3 @@
-# WCZoom WordPress Plugin
+# WooCommerce - Zoom Integration
 
 Sell virtual Zoom webinars with WooCommerce
