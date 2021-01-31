@@ -17,7 +17,7 @@ namespace SeattleWebCo\WCZoom;
 
 define( 'WC_ZOOM_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WC_ZOOM_URL', plugin_dir_url( __FILE__ ) );
-define( 'WC_ZOOM_VER', get_plugin_data( __FILE__ )['Version'] ?? '1.0.0' );
+define( 'WC_ZOOM_VER', function_exists( 'get_plugin_data' ) ? get_plugin_data( __FILE__ )['Version'] : '1.0.0' );
 define( 'WC_ZOOM_DB_VER', '1.0.0' );
 define( 'WC_ZOOM_BASE', __FILE__ );
 
@@ -38,6 +38,7 @@ $GLOBALS['wc_zoom'] = new Api(
 	)
 );
 
+/*
 session_start();
 
 add_action(
@@ -83,6 +84,7 @@ add_action(
 		}
 	}
 );
+*/
 
 /**
  * Activation hook

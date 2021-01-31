@@ -163,16 +163,16 @@ function wc_zoom_get_item_data( $item_data, $cart_item_data ) {
 				continue;
 			}
 
-			$display = $webinar['topic'];
+			$display = '';
 
 			if ( $start_time ) {
-				$display .= ' - ' . wc_zoom_format_date_time( $start_time, $webinar['timezone'] );
+				$display = wc_zoom_format_date_time( $start_time, $webinar['timezone'] );
 			} elseif ( ! empty( $occurrence ) ) {
-				$display .= ' - ' . wc_zoom_format_date_time( $occurrence['start_time'], $webinar['timezone'] );
+				$display = wc_zoom_format_date_time( $occurrence['start_time'], $webinar['timezone'] );
 			}
 
 			$item_data[] = array(
-				'key'       => esc_html__( 'Webinar', 'wc-zoom' ),
+				'key'       => esc_html( $webinar['topic'] ),
 				'value'     => esc_html( $display ),
 			);
 		}
@@ -214,3 +214,51 @@ function wc_zoom_check_cart_items() {
 	return $return;
 }
 add_action( 'woocommerce_check_cart_items', 'wc_zoom_check_cart_items' );
+
+/**
+ * Add order line item meta
+ *
+ * @param WC_Order_Item_Product $item Current product while looping through order items.
+ * @param string                $cart_item_key Cart product item key.
+ * @param array                 $values Cart item data.
+ * @param WC_Order              $order Current order.
+ * @return void
+ */
+function wc_zoom_create_order_line_item( $item, $cart_item_key, $values, $order ) {
+	if ( isset( $values['wc_zoom_webinars'] ) ) {
+		foreach ( $values['wc_zoom_webinars'] as $webinar ) {
+            // phpcs:ignore
+			$occurrence_id = $_POST['_wc_zoom_webinars_occurrences'][ $webinar['id'] ] ?? '';
+
+			$cart_item_data['wc_zoom_webinars_occurrences'][ $webinar['id'] ] = wc_zoom_get_available_webinar_occurrence( $webinar, (string) $occurrence_id );
+
+			$item->add_meta_data( __( 'Webinar', 'wc-zoom' ), esc_html( $webinar['topic'] . ' - ' ) );
+
+		}
+	}
+
+	$item->add_meta_data( __( 'Engraving', 'wc-zoom' ), 'test' );
+}
+add_action( 'woocommerce_checkout_create_order_line_item', 'wc_zoom_create_order_line_item', 10, 4 );
+
+
+
+/**
+ * Register the user to purchased webinars
+ *
+ * @param integer $order_id ID or order completed.
+ * @return void
+ */
+function wc_zoom_payment_complete( $order_id ) {
+	$order = wc_get_order( $order_id );
+
+	foreach ( $order->get_items() as $item ) {
+		if ( $item->is_type( 'line_item' ) ) {
+			$product = $item->get_product();
+
+			// var_dump( $item->get_meta_data() );
+
+		}
+	}
+}
+add_action( 'woocommerce_payment_complete', 'wc_zoom_payment_complete' );

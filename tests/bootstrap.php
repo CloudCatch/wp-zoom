@@ -23,6 +23,10 @@ require_once $_tests_dir . '/includes/functions.php';
  * Manually load the plugin being tested.
  */
 function _manually_load_plugin() {
+	require dirname( dirname( __FILE__ ) ) . '/../woocommerce/woocommerce.php';
+
+	WC_Install::init();
+
 	require dirname( dirname( __FILE__ ) ) . '/wc-zoom.php';
 
 	\SeattleWebCo\WCZoom\wc_zoom_activation();
