@@ -133,7 +133,6 @@ mix
  */
 mix.webpackConfig({
     stats: 'minimal',
-    devtool: 'none',
     performance: {hints: false},
     externals: {jquery: 'jQuery'},
     plugins: [

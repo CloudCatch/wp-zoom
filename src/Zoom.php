@@ -21,12 +21,6 @@ class Zoom extends AbstractProvider {
 
 	use BearerAuthorizationTrait;
 
-	protected $clientId = 'RzaG1zWQKOkwSgjF7n4Pw';
-
-	protected $clientSecret = '7apr9qHaFC5KLsLtpjsQ21PS7dYvfgwD';
-
-	protected $redirectUri = 'https://sandbox.local.lndo.site/?wc-zoom-oauth';
-
 	/**
 	 * Response error
 	 *
@@ -54,7 +48,7 @@ class Zoom extends AbstractProvider {
 	 * @return string
 	 */
 	public function getBaseAuthorizationUrl() {
-		return 'https://zoom.us/oauth/authorize';
+		return 'https://api.seattlewebco.com/oauth?provider=zoom';
 	}
 
 	/**
@@ -64,7 +58,7 @@ class Zoom extends AbstractProvider {
 	 * @return string
 	 */
 	public function getBaseAccessTokenUrl( array $params ) {
-		return 'https://zoom.us/oauth/token';
+		return 'https://api.seattlewebco.com/oauth/token?provider=zoom';
 	}
 
 	/**
@@ -84,10 +78,6 @@ class Zoom extends AbstractProvider {
 	 */
 	protected function getDefaultScopes() {
 		return array(
-			'meeting:read',
-			'meeting:write',
-			'user:read',
-			'user:write',
 			'user_profile',
 			'webinar:read',
 			'webinar:write',
@@ -103,25 +93,25 @@ class Zoom extends AbstractProvider {
 	 * @throws IdentityProviderException Identity provider exception.
 	 */
 	protected function checkResponse( ResponseInterface $response, $data ) {
-		try {
-			if ( ! empty( $data[ $this->response_error ] ) ) {
-				$error = $data[ $this->response_error ];
+		// try {
+		if ( ! empty( $data[ $this->response_error ] ) ) {
+			$error = $data[ $this->response_error ];
 
-				if ( ! is_string( $error ) ) {
-					$error = var_export( $error, true );
-				}
-
-				$code = $this->response_code && ! empty( $data[ $this->response_code ] ) ? $data[ $this->response_code ] : 0;
-
-				if ( ! is_int( $code ) ) {
-					$code = intval( $code );
-				}
-
-				throw new IdentityProviderException( $error, $code, $data );
+			if ( ! is_string( $error ) ) {
+				$error = var_export( $error, true );
 			}
-		} catch ( \Exception $e ) {
 
+			$code = $this->response_code && ! empty( $data[ $this->response_code ] ) ? $data[ $this->response_code ] : 0;
+
+			if ( ! is_int( $code ) ) {
+				$code = intval( $code );
+			}
+
+			throw new IdentityProviderException( $error, $code, $data );
 		}
+		// } catch ( \Exception $e ) {
+
+		// }
 	}
 
 	/**

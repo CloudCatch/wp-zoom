@@ -32,7 +32,17 @@ class Api {
 		$this->user_id = get_option( 'wc_zoom_user_id', null );
 	}
 
-	public function update_access_token( AccessToken $access_token ) {
+	/**
+	 * Update access token in database
+	 *
+	 * @param AccessToken|Array $access_token Access token data to save to database.
+	 * @return AccessToken
+	 */
+	public function update_access_token( $access_token ) {
+		if ( ! $access_token instanceof AccessToken ) {
+			$access_token = new AccessToken( $access_token );
+		}
+
 		update_option(
 			'wc_zoom_oauth_tokens',
 			$access_token->jsonSerialize()
@@ -57,16 +67,6 @@ class Api {
 		}
 
 		return new AccessToken( $tokens );
-	}
-
-	public function revoke_access_token() {
-		$request = $this->provider->getAuthenticatedRequest(
-			'POST',
-			add_query_arg( array( 'token' => (string) $this->get_access_token() ), 'https://api.zoom.us/oauth/revoke' ),
-			$this->get_access_token()
-		);
-
-		return $this->provider->getParsedResponse( $request );
 	}
 
 	/**
@@ -105,7 +105,7 @@ class Api {
 
 		$request = $this->provider->getAuthenticatedRequest(
 			'GET',
-			$this->base_uri . '/webinars/1' . $webinar_id,
+			$this->base_uri . '/webinars/' . $webinar_id,
 			$this->get_access_token(),
 			array(
 				'headers' => array( 'Content-Type' => 'application/json;charset=UTF-8' ),

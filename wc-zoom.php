@@ -33,7 +33,8 @@ require_once 'includes/wc-zoom-helper-functions.php';
 $GLOBALS['wc_zoom'] = new Api(
 	new Zoom(
 		array(
-			'timeout' => 30,
+			'redirectUri' => admin_url( 'admin.php?page=wc-settings&tab=integration&section=wc_zoom' ),
+			'timeout'     => 30,
 		)
 	)
 );

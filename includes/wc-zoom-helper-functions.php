@@ -86,7 +86,7 @@ function wc_zoom_product_has_webinars( $product = null ) {
  * @return bool|array Array if occurrence found otherwise false
  */
 function wc_zoom_get_available_webinar_occurrence( array $webinar, string $occurrence_id ) {
-	if ( $webinar['type'] === '9' && ! empty( $webinar['occurrences'] ) ) {
+	if ( ! empty( $webinar['occurrences'] ) ) {
 		// Only allow available occurrences.
 		$available_occurrences = array_filter(
 			$webinar['occurrences'],

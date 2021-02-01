@@ -27,6 +27,8 @@ class Settings extends \WC_Integration {
 		add_action( 'admin_post_wc_zoom_revoke', array( $this, 'revoke_authorization' ) );
 
 		add_action( 'admin_init', array( $this, 'purge_cache' ) );
+
+		add_action( 'admin_init', array( $this, 'save_tokens' ), -10 );
 	}
 
 	public function enqueue_scripts() {
@@ -46,7 +48,8 @@ class Settings extends \WC_Integration {
 			wp_die( esc_html__( 'Invalid nonce, please try again.', 'wc-zoom' ) );
 		}
 
-		wp_safe_redirect( $wc_zoom->provider->getAuthorizationUrl() );
+		// phpcs:ignore
+		wp_redirect( $wc_zoom->provider->getAuthorizationUrl() );
 		exit;
 	}
 
@@ -62,9 +65,8 @@ class Settings extends \WC_Integration {
 			wp_die( esc_html__( 'Invalid nonce, please try again.', 'wc-zoom' ) );
 		}
 
-		$wc_zoom->revoke_access_token();
-
 		delete_option( 'wc_zoom_oauth_tokens' );
+		delete_option( 'wc_zoom_user_id' );
 
 		Cache::delete_all();
 
@@ -104,6 +106,43 @@ class Settings extends \WC_Integration {
 		);
 	}
 
+	public function save_tokens() {
+		global $wc_zoom;
+
+		// phpcs:ignore
+		$tokens = $_GET['wc_zoom_tokens'] ?? null;
+
+		if ( $tokens ) {
+			$tokens = json_decode( json_decode( stripslashes( $tokens ) ), true );
+
+			if ( isset( $tokens['access_token'] ) ) {
+				$wc_zoom->update_access_token( $tokens );
+
+				$zoom_user = $wc_zoom->get_me();
+
+				if ( isset( $zoom_user['id'] ) ) {
+					update_option( 'wc_zoom_user_id', $zoom_user['id'] );
+				}
+
+				wp_safe_redirect( admin_url( 'admin.php?page=wc-settings&tab=integration&section=wc_zoom' ) );
+				exit;
+			} else {
+				add_action(
+					'admin_notices',
+					function() use ( $tokens ) {
+						?>
+		
+					<div class="notice notice-error is-dismissible">
+						<p><?php esc_html_e( 'The following error was received during authorization', 'wc-zoom' ); ?>: <?php echo esc_html( wp_json_encode( $tokens ) ); ?></p>
+					</div>
+		
+						<?php
+					}
+				);
+			}
+		}
+	}
+
 	public function admin_options() {
 		?>
 
@@ -137,11 +176,9 @@ class Settings extends \WC_Integration {
 				<?php printf( __( 'Connected to account: %s', 'wc-zoom' ), esc_html( $me['first_name'] . ' ' . $me['last_name'] ) ); ?>
 			</p>
 			<p>
-				<a class="disconnect-wc-zoom" href="<?php echo esc_url( \wp_nonce_url( admin_url( 'admin-post.php?action=wc_zoom_revoke' ), 'wc-zoom-revoke' ) ); ?>">
+				<a class="disconnect-wc-zoom button" href="<?php echo esc_url( \wp_nonce_url( admin_url( 'admin-post.php?action=wc_zoom_revoke' ), 'wc-zoom-revoke' ) ); ?>">
 					<?php esc_html_e( 'Revoke Zoom Authorization', 'wc-zoom' ); ?>
 				</a> 
-			</p>
-			<p>
 				<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'purge_wc_zoom_cache' => 1 ) ), 'wc-zoom-purge-cache' ) ); ?>" class="button">
 					<?php esc_html_e( 'Purge Zoom API Cache', 'wc-zoom' ); ?>
 				</a>

@@ -8,6 +8,7 @@
 /phpcs.xml
 /node_modules
 /tests
+/build
 /coverage
 /bin
 /phpunit.xml
@@ -19,10 +20,13 @@
 .distignore
 .env
 .eslintignore
+.eslintrc
 .eslintrc.json
 .gitattributes
 .gitignore
 .releaserc.js
+.stylelintignore
+.stylelintrc.json
 .travis.yml
 .phpcs.xml.dist
 .env
@@ -31,6 +35,7 @@ CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 CREDITS.md
 LICENSE.md
+LICENSE
 README.md
 composer.json
 composer.lock

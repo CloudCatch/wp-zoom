@@ -14,7 +14,7 @@ use SeattleWebCo\WCZoom\Cache;
  */
 function wc_zoom_single_product_summary() {
 	global $webinars;
-
+	
 	if ( ! empty( $webinars ) && is_array( $webinars ) ) {
 		?>
 
