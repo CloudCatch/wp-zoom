@@ -32,6 +32,10 @@
 	font-family: "wc-zoom";
 }
 
+.wc-zoom-webinars-field + .select2 {
+	width: 100% !important;
+}
+
 @font-face {
 	font-family: "wc-zoom";
 	src: url("../fonts/wc-zoom.eot?94z1gq");

@@ -78,10 +78,7 @@ class Api {
 		$request = $this->provider->getAuthenticatedRequest(
 			'GET',
 			$this->base_uri . '/users/me',
-			$this->get_access_token(),
-			array(
-				'headers' => array( 'Content-Type' => 'application/json;charset=UTF-8' ),
-			)
+			$this->get_access_token()
 		);
 
 		return $this->provider->getParsedResponse( $request );
@@ -105,11 +102,8 @@ class Api {
 
 		$request = $this->provider->getAuthenticatedRequest(
 			'GET',
-			$this->base_uri . '/webinars/1' . $webinar_id,
-			$this->get_access_token(),
-			array(
-				'headers' => array( 'Content-Type' => 'application/json;charset=UTF-8' ),
-			)
+			$this->base_uri . '/webinars/' . $webinar_id,
+			$this->get_access_token()
 		);
 
 		$response = $this->provider->getParsedResponse( $request );
@@ -137,10 +131,7 @@ class Api {
 		$request = $this->provider->getAuthenticatedRequest(
 			'GET',
 			add_query_arg( array( 'page_size' => 300 ), $this->base_uri . '/users/' . $this->user_id . '/webinars' ),
-			$this->get_access_token(),
-			array(
-				'headers' => array( 'Content-Type' => 'application/json;charset=UTF-8' ),
-			)
+			$this->get_access_token()
 		);
 
 		$response = $this->provider->getParsedResponse( $request );
@@ -164,12 +155,9 @@ class Api {
 			add_query_arg( array( 'occurrence_ids' => $occurrence_id ), $this->base_uri . '/webinars/' . $webinar_id . '/registrants' ),
 			$this->get_access_token(),
 			array(
-				'headers' => array(
-					'headers' => array( 'Content-Type' => 'application/json;charset=UTF-8' ),
-				),
 				'body' => json_encode(
 					array(
-						'email'      => $customer->get_billing_email(),
+						'email'      => $customer->get_email(),
 						'first_name' => $customer->get_first_name(),
 						'last_name'  => $customer->get_last_name(),
 						'address'    => $customer->get_billing_address(),

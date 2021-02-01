@@ -22,7 +22,7 @@ function wc_zoom_format_date_time( string $datetime, string $timezone = 'GMT' ) 
 
 	$local_datetime = new DateTime( $gmt_datetime->format( 'Y-m-d H:i:s' ), $local_timezone );
 
-	return apply_filters( 'wc_zoom_datetime_format', $local_datetime->format( 'l, F jS, Y \a\t g:ia T' ) );
+	return $local_datetime->format( apply_filters( 'wc_zoom_datetime_format', 'l, F jS, Y \a\t g:ia T' ) );
 }
 
 /**
@@ -86,7 +86,7 @@ function wc_zoom_product_has_webinars( $product = null ) {
  * @return bool|array Array if occurrence found otherwise false
  */
 function wc_zoom_get_available_webinar_occurrence( array $webinar, string $occurrence_id ) {
-	if ( ! empty( $webinar['occurrences'] ) ) {
+	if ( $webinar['type'] === '9' && ! empty( $webinar['occurrences'] ) ) {
 		// Only allow available occurrences.
 		$available_occurrences = array_filter(
 			$webinar['occurrences'],

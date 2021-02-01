@@ -18,7 +18,6 @@ function wc_zoom_render_field_select_webinars( array $args = array() ) {
 		$args,
 		array(
 			'name'          => '_wc_zoom_webinars',
-			'id'            => '_wc_zoom_webinars',
 			'placeholder'   => esc_html__( 'Select Webinar', 'wc-zoom' ),
 			'selected'      => array(),
 			'multiple'      => false,
@@ -30,9 +29,9 @@ function wc_zoom_render_field_select_webinars( array $args = array() ) {
 
 	<select 
 		name="<?php echo esc_attr( $args['name'] ); ?><?php echo $args['multiple'] ? '[]' : ''; ?>" 
-		id="<?php echo esc_attr( $args['id'] ); ?>" 
 		<?php echo $args['multiple'] ? 'multiple' : ''; ?>
 		placeholder="<?php echo esc_attr( $args['placeholder'] ); ?>"
+		class="wc-zoom-webinars-field"
 	>
 		<?php foreach ( $webinars['webinars'] as $webinar ) { ?>
 

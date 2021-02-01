@@ -90,7 +90,7 @@ add_action(
  * Activation hook
  */
 function wc_zoom_activation() {
-	if ( version_compare( PHP_VERSION, '7.0.0', '<' ) ) {
+	if ( version_compare( PHP_VERSION, '7.2.0', '<' ) ) {
 		deactivate_plugins( basename( __FILE__ ) );
 		wp_die(
 			esc_html__( 'This plugin requires a minimum PHP version of 7.0.0', 'wc-zoom' ),

@@ -8,6 +8,7 @@
 /phpcs.xml
 /node_modules
 /tests
+/coverage
 /bin
 /phpunit.xml
 /bin

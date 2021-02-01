@@ -19,6 +19,13 @@ if ( ! file_exists( $_tests_dir . '/includes/functions.php' ) ) {
 // Give access to tests_add_filter() function.
 require_once $_tests_dir . '/includes/functions.php';
 
+// Include helper functions.
+require_once 'helpers/class-wc-helper-product.php';
+require_once 'helpers/class-wc-helper-customer.php';
+
+// Include mocks.
+require_once 'mocks/class-zoom-mock-api.php';
+
 /**
  * Manually load the plugin being tested.
  */
