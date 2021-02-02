@@ -39,8 +39,16 @@ class Api {
 	 * @return AccessToken
 	 */
 	public function update_access_token( $access_token ) {
-		if ( ! $access_token instanceof AccessToken ) {
-			$access_token = new AccessToken( $access_token );
+		if ( is_array( $access_token ) ) {
+			$access_token = wp_parse_args( $access_token, array( 
+				'access_token'		=> 'null'
+			) );
+
+			$access_token = new AccessToken( (array) $access_token );
+		}
+
+		if ( (string) $access_token === 'null' ) {
+			return $access_token;
 		}
 
 		update_option(
@@ -59,7 +67,7 @@ class Api {
 		if ( empty( $tokens['access_token'] ) || empty( $tokens['refresh_token'] ) || empty( $tokens['expires'] ) ) {
 			return null;
 		}
-
+ 
 		if ( $tokens['expires'] <= time() ) {
 			$access_token = $this->provider->getAccessToken( 'refresh_token', array( 'refresh_token' => $tokens['refresh_token'] ) );
 

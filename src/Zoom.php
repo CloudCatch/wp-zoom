@@ -93,25 +93,25 @@ class Zoom extends AbstractProvider {
 	 * @throws IdentityProviderException Identity provider exception.
 	 */
 	protected function checkResponse( ResponseInterface $response, $data ) {
-		// try {
-		if ( ! empty( $data[ $this->response_error ] ) ) {
-			$error = $data[ $this->response_error ];
+		try {
+			if ( ! empty( $data[ $this->response_error ] ) ) {
+				$error = $data[ $this->response_error ];
 
-			if ( ! is_string( $error ) ) {
-				$error = var_export( $error, true );
+				if ( ! is_string( $error ) ) {
+					$error = var_export( $error, true );
+				}
+
+				$code = $this->response_code && ! empty( $data[ $this->response_code ] ) ? $data[ $this->response_code ] : 0;
+
+				if ( ! is_int( $code ) ) {
+					$code = intval( $code );
+				}
+
+				throw new IdentityProviderException( $error, $code, $data );
 			}
-
-			$code = $this->response_code && ! empty( $data[ $this->response_code ] ) ? $data[ $this->response_code ] : 0;
-
-			if ( ! is_int( $code ) ) {
-				$code = intval( $code );
-			}
-
-			throw new IdentityProviderException( $error, $code, $data );
+		} catch ( \Exception $e ) {
+			
 		}
-		// } catch ( \Exception $e ) {
-
-		// }
 	}
 
 	/**
