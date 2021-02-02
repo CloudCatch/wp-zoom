@@ -40,9 +40,12 @@ class Api {
 	 */
 	public function update_access_token( $access_token ) {
 		if ( is_array( $access_token ) ) {
-			$access_token = wp_parse_args( $access_token, array( 
-				'access_token'		=> 'null'
-			) );
+			$access_token = wp_parse_args(
+				$access_token,
+				array(
+					'access_token'      => 'null',
+				)
+			);
 
 			$access_token = new AccessToken( (array) $access_token );
 		}
@@ -59,22 +62,31 @@ class Api {
 		return $access_token;
 	}
 
+	/**
+	 * Returns a valid access token and refreshes the current one if needed
+	 *
+	 * @return AccessToken|string
+	 */
 	private function get_access_token() {
-		error_log( 'API called' );
+		try {
+			$tokens = get_option( 'wc_zoom_oauth_tokens', array() );
 
-		$tokens = get_option( 'wc_zoom_oauth_tokens', array() );
+			if ( empty( $tokens['access_token'] ) || empty( $tokens['refresh_token'] ) || empty( $tokens['expires'] ) ) {
+				return null;
+			}
 
-		if ( empty( $tokens['access_token'] ) || empty( $tokens['refresh_token'] ) || empty( $tokens['expires'] ) ) {
-			return null;
+			if ( $tokens['expires'] <= time() ) {
+				$access_token = $this->provider->getAccessToken( 'refresh_token', array( 'refresh_token' => $tokens['refresh_token'] ) );
+
+				return $this->update_access_token( $access_token );
+			}
+
+			return new AccessToken( $tokens );
+		} catch ( \Exception $e ) {
+			error_log( $e->getMessage() );
+
+			return '';
 		}
- 
-		if ( $tokens['expires'] <= time() ) {
-			$access_token = $this->provider->getAccessToken( 'refresh_token', array( 'refresh_token' => $tokens['refresh_token'] ) );
-
-			return $this->update_access_token( $access_token );
-		}
-
-		return new AccessToken( $tokens );
 	}
 
 	/**
@@ -83,16 +95,22 @@ class Api {
 	 * @return string
 	 */
 	public function get_me() {
-		$request = $this->provider->getAuthenticatedRequest(
-			'GET',
-			$this->base_uri . '/users/me',
-			$this->get_access_token(),
-			array(
-				'headers' => array( 'Content-Type' => 'application/json;charset=UTF-8' ),
-			)
-		);
+		try {
+			$request = $this->provider->getAuthenticatedRequest(
+				'GET',
+				$this->base_uri . '/users/me',
+				$this->get_access_token(),
+				array(
+					'headers' => array( 'Content-Type' => 'application/json;charset=UTF-8' ),
+				)
+			);
 
-		return $this->provider->getParsedResponse( $request );
+			return $this->provider->getParsedResponse( $request );
+		} catch ( \Exception $e ) {
+			error_log( $e->getMessage() );
+
+			return wp_json_encode( array() );
+		}
 	}
 
 	/**
