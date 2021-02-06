@@ -2,10 +2,10 @@
 /**
  * Api class file
  *
- * @package SeattleWebCo\WCZoom
+ * @package SeattleWebCo\WPZoom
  */
 
-namespace SeattleWebCo\WCZoom;
+namespace SeattleWebCo\WPZoom;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessToken;
@@ -29,7 +29,7 @@ class Api {
 	public function __construct( AbstractProvider $provider ) {
 		$this->provider = $provider;
 
-		$this->user_id = get_option( 'wc_zoom_user_id', null );
+		$this->user_id = get_option( 'wp_zoom_user_id', null );
 	}
 
 	/**
@@ -55,7 +55,7 @@ class Api {
 		}
 
 		update_option(
-			'wc_zoom_oauth_tokens',
+			'wp_zoom_oauth_tokens',
 			$access_token->jsonSerialize()
 		);
 
@@ -69,7 +69,7 @@ class Api {
 	 */
 	private function get_access_token() {
 		try {
-			$tokens = get_option( 'wc_zoom_oauth_tokens', array() );
+			$tokens = get_option( 'wp_zoom_oauth_tokens', array() );
 
 			if ( empty( $tokens['access_token'] ) || empty( $tokens['refresh_token'] ) || empty( $tokens['expires'] ) ) {
 				return null;
@@ -122,7 +122,7 @@ class Api {
 	 */
 	public function get_webinar( string $webinar_id, bool $cached = true ) {
 		if ( $cached ) {
-			$cache = Cache::get( 'wc_zoom_webinar_' . $webinar_id );
+			$cache = Cache::get( 'wp_zoom_webinar_' . $webinar_id );
 
 			if ( false !== $cache ) {
 				return $cache;
@@ -140,7 +140,7 @@ class Api {
 
 		$response = $this->provider->getParsedResponse( $request );
 
-		Cache::set( 'wc_zoom_webinar_' . $webinar_id, $response, 'wc_zoom_webinars' );
+		Cache::set( 'wp_zoom_webinar_' . $webinar_id, $response, 'wp_zoom_webinars' );
 
 		return $response;
 	}
@@ -153,7 +153,7 @@ class Api {
 	 */
 	public function get_webinars( bool $cached = true ) {
 		if ( $cached ) {
-			$cache = Cache::get( 'wc_zoom_webinars' );
+			$cache = Cache::get( 'wp_zoom_webinars' );
 
 			if ( false !== $cache ) {
 				return $cache;
@@ -171,7 +171,7 @@ class Api {
 
 		$response = $this->provider->getParsedResponse( $request );
 
-		Cache::set( 'wc_zoom_webinars', $response, 'wc_zoom_webinars' );
+		Cache::set( 'wp_zoom_webinars', $response, 'wp_zoom_webinars' );
 
 		return $response;
 	}

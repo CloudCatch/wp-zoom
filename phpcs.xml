@@ -2,7 +2,7 @@
 <ruleset name="WordPress Coding Standards">
 	<description>PHP_CodeSniffer ruleset.</description>
 
-	<file>wc-zoom.php</file>
+	<file>wp-zoom.php</file>
 	<file>src/.</file>
 	<file>includes/.</file>
 
@@ -32,7 +32,7 @@
 
 	<rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="text_domain" type="array" value="wc-zoom" />
+			<property name="text_domain" type="array" value="wp-zoom" />
 		</properties>
 	</rule>
 

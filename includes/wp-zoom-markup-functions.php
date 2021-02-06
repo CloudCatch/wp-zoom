@@ -2,7 +2,7 @@
 /**
  * Product metabox settings
  *
- * @package SeattleWebCo\WCZoom
+ * @package SeattleWebCo\WPZoom
  */
 
 /**
@@ -11,27 +11,27 @@
  * @param array $args <select> field arguments.
  * @return void
  */
-function wc_zoom_render_field_select_webinars( array $args = array() ) {
-	global $wc_zoom;
+function wp_zoom_render_field_select_webinars( array $args = array() ) {
+	global $wp_zoom;
 
 	$args = wp_parse_args(
 		$args,
 		array(
-			'name'          => '_wc_zoom_webinars',
-			'placeholder'   => esc_html__( 'Select Webinar', 'wc-zoom' ),
+			'name'          => '_wp_zoom_webinars',
+			'placeholder'   => esc_html__( 'Select Webinar', 'wp-zoom' ),
 			'selected'      => array(),
 			'multiple'      => false,
 		)
 	);
 
-	$webinars = $wc_zoom->get_webinars( false );
+	$webinars = $wp_zoom->get_webinars( false );
 	?>
 
 	<select 
 		name="<?php echo esc_attr( $args['name'] ); ?><?php echo $args['multiple'] ? '[]' : ''; ?>" 
 		<?php echo $args['multiple'] ? 'multiple' : ''; ?>
 		placeholder="<?php echo esc_attr( $args['placeholder'] ); ?>"
-		class="wc-zoom-webinars-field"
+		class="wp-zoom-webinars-field"
 	>
 		<?php foreach ( $webinars['webinars'] as $webinar ) { ?>
 
@@ -53,13 +53,13 @@ function wc_zoom_render_field_select_webinars( array $args = array() ) {
  * @param array $args <select> field arguments.
  * @return void
  */
-function wc_zoom_render_field_select_webinar_occurrence( array $webinar, array $args = array() ) {
+function wp_zoom_render_field_select_webinar_occurrence( array $webinar, array $args = array() ) {
 	$args = wp_parse_args(
 		$args,
 		array(
-			'name'          => '_wc_zoom_webinars_occurrences',
-			'id'            => '_wc_zoom_webinars_occurrences',
-			'placeholder'   => esc_html__( 'Select Date & Time', 'wc-zoom' ),
+			'name'          => '_wp_zoom_webinars_occurrences',
+			'id'            => '_wp_zoom_webinars_occurrences',
+			'placeholder'   => esc_html__( 'Select Date & Time', 'wp-zoom' ),
 			'selected'      => array(),
 			'multiple'      => false,
 		)
@@ -82,7 +82,7 @@ function wc_zoom_render_field_select_webinar_occurrence( array $webinar, array $
 					value="<?php echo esc_attr( $occurrence['occurrence_id'] ); ?>"
 					<?php echo esc_attr( $occurrence['status'] !== 'available' ? 'disabled' : '' ); ?>
 				>
-					<?php echo esc_html( wc_zoom_format_date_time( $occurrence['start_time'], $webinar['timezone'] ) ); ?>
+					<?php echo esc_html( wp_zoom_format_date_time( $occurrence['start_time'], $webinar['timezone'] ) ); ?>
 				</option>
 			<?php } ?>``
 
@@ -90,7 +90,7 @@ function wc_zoom_render_field_select_webinar_occurrence( array $webinar, array $
 
 	<?php } else { ?>
 
-	<span class="wc-zoom-no-occurrences"><?php esc_html_e( 'No available dates and times', 'wc-zoom' ); ?></span>
+	<span class="wp-zoom-no-occurrences"><?php esc_html_e( 'No available dates and times', 'wp-zoom' ); ?></span>
 
 		<?php
 	}

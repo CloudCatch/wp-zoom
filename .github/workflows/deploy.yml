@@ -3,37 +3,35 @@ name: Deploy
 on:
   push:
     branches:
-    - master
+      - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Run composer install
-      run: |
-        composer clear-cache
-        composer install --no-dev --prefer-dist
-    
-    - name: Install npm packages
-      run: |
-        npm ci
+      - name: Run composer install
+        run: |
+          composer clear-cache
+          composer install --no-dev --prefer-dist
 
-    - name: Semantic release
-      id: semantic
-      uses: codfish/semantic-release-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install npm packages
+        run: |
+          npm ci
 
+      - name: Semantic release
+        id: semantic
+        uses: codfish/semantic-release-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     # - name: Compress files
     #  if: steps.semantic.outputs.new-release-published == 'true'
     #  run: |
-    #    mkdir -p wc-zoom
-    #    rsync -a --cvs-exclude --delete --filter=':- .distignore' ./ ./wc-zoom
-    #    zip -r wc-zoom.zip wc-zoom
-
+    #    mkdir -p wp-zoom
+    #    rsync -a --cvs-exclude --delete --filter=':- .distignore' ./ ./wp-zoom
+    #    zip -r wp-zoom.zip wp-zoom
     # - name: Deploy to production
     #  if: steps.semantic.outputs.new-release-published == 'true'
     #  uses: AEnterprise/rsync-deploy@master
@@ -41,7 +39,7 @@ jobs:
     #      DEPLOY_KEY: ${{ secrets.SERVER_SSH_KEY }}
     #      ARGS: "-e -c -r --delete"
     #      SERVER_PORT: ${{ secrets.SERVER_PORT }}
-    #      FOLDER: "./wc-zoom.zip"
+    #      FOLDER: "./wp-zoom.zip"
     #      SERVER_IP: ${{ secrets.PRODUCTION_HOST }}
     #      USERNAME: ${{ secrets.PRODUCTION_USERNAME }}
-    #      SERVER_DESTINATION: ${{ secrets.PRODUCTION_DESTINATION }} 
+    #      SERVER_DESTINATION: ${{ secrets.PRODUCTION_DESTINATION }}

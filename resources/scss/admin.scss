@@ -25,18 +25,18 @@
 	}
 }
 
-#woocommerce-coupon-data ul.wc-tabs li.wc-zoom_options a:before,
-#woocommerce-product-data ul.wc-tabs li.wc-zoom_options a:before,
-.woocommerce ul.wc-tabs li.wc-zoom_options a:before {
+#woocommerce-coupon-data ul.wc-tabs li.wp-zoom_options a:before,
+#woocommerce-product-data ul.wc-tabs li.wp-zoom_options a:before,
+.woocommerce ul.wc-tabs li.wp-zoom_options a:before {
 	content: "\e900";
-	font-family: "wc-zoom";
+	font-family: "wp-zoom";
 }
 
-.wc-zoom-webinars-field + .select2 {
+.wp-zoom-webinars-field + .select2 {
 	width: 100% !important;
 }
 
-.wp-core-ui a.disconnect-wc-zoom.button {
+.wp-core-ui a.disconnect-wp-zoom.button {
 	color: #c20000;
 	border-color: #c20000;
 
@@ -52,23 +52,23 @@
 }
 
 @font-face {
-	font-family: "wc-zoom";
-	src: url("../fonts/wc-zoom.eot?94z1gq");
+	font-family: "wp-zoom";
+	src: url("../fonts/wp-zoom.eot?94z1gq");
 	src:
-		url("../fonts/wc-zoom.eot?94z1gq#iefix") format("embedded-opentype"),
-		url("../fonts/wc-zoom.ttf?94z1gq") format("truetype"),
-		url("../fonts/wc-zoom.woff?94z1gq") format("woff"),
-		url("../fonts/wc-zoom.svg?94z1gq#wc-zoom") format("svg");
+		url("../fonts/wp-zoom.eot?94z1gq#iefix") format("embedded-opentype"),
+		url("../fonts/wp-zoom.ttf?94z1gq") format("truetype"),
+		url("../fonts/wp-zoom.woff?94z1gq") format("woff"),
+		url("../fonts/wp-zoom.svg?94z1gq#wp-zoom") format("svg");
 	font-weight: normal;
 	font-style: normal;
 	font-display: block;
 }
 
-[class^="wc-zoom-icon-"],
-[class*=" wc-zoom-icon-"] {
+[class^="wp-zoom-icon-"],
+[class*=" wp-zoom-icon-"] {
 
 	/* use !important to prevent issues with browser extensions that change fonts */
-	font-family: "wc-zoom" !important;
+	font-family: "wp-zoom" !important;
 	speak: never;
 	font-style: normal;
 	font-weight: normal;
@@ -81,6 +81,6 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
-.wc-zoom-icon-zoom-icon:before {
+.wp-zoom-icon-zoom-icon:before {
 	content: "\e900";
 }

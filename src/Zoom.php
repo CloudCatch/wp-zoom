@@ -2,10 +2,10 @@
 /**
  * OAuth2 Provider class file
  *
- * @package SeattleWebCo\WCZoom
+ * @package SeattleWebCo\WPZoom
  */
 
-namespace SeattleWebCo\WCZoom;
+namespace SeattleWebCo\WPZoom;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\GenericResourceOwner;

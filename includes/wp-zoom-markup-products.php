@@ -2,17 +2,17 @@
 /**
  * Product markup hooks
  *
- * @package SeattleWebCo\WCZoom
+ * @package SeattleWebCo\WPZoom
  */
 
-use SeattleWebCo\WCZoom\Cache;
+use SeattleWebCo\WPZoom\Cache;
 
 /**
  * Render webinars associated with a product and conditionally display occurrence select date and time
  *
  * @return void
  */
-function wc_zoom_single_product_summary() {
+function wp_zoom_single_product_summary() {
 	global $webinars;
 	
 	if ( ! empty( $webinars ) && is_array( $webinars ) ) {
@@ -20,30 +20,30 @@ function wc_zoom_single_product_summary() {
 
 		<?php foreach ( $webinars as $webinar ) { ?>
 
-			<div class="wc-zoom-webinar-group">
-				<div class="wc-zoom-webinar-field">
+			<div class="wp-zoom-webinar-group">
+				<div class="wp-zoom-webinar-field">
 					<label>
 						<?php echo esc_html( $webinar['topic'] ); ?>
 					</label>
-					<div class="wc-zoom-webinar-field-date">
+					<div class="wp-zoom-webinar-field-date">
 						<?php
 						switch ( $webinar['type'] ) {
 							// Normal webinar with start time.
 							case '5':
-								echo esc_html( wc_zoom_format_date_time( $webinar['start_time'], $webinar['timezone'] ) );
+								echo esc_html( wp_zoom_format_date_time( $webinar['start_time'], $webinar['timezone'] ) );
 								break;
 
 							// Recurring webinar with no fixed time.
 							case '6':
-								esc_html_e( 'Recurring webinar', 'wc-zoom' );
+								esc_html_e( 'Recurring webinar', 'wp-zoom' );
 								break;
 
 							// Recurring webinar with fixed time.
 							case '9':
-								wc_zoom_render_field_select_webinar_occurrence(
+								wp_zoom_render_field_select_webinar_occurrence(
 									$webinar,
 									array(
-										'name' => esc_attr( '_wc_zoom_webinars_occurrences[' . $webinar['id'] . ']' ),
+										'name' => esc_attr( '_wp_zoom_webinars_occurrences[' . $webinar['id'] . ']' ),
 									)
 								);
 								break;
@@ -59,7 +59,7 @@ function wc_zoom_single_product_summary() {
 	}
 
 }
-add_action( 'woocommerce_before_add_to_cart_button', 'wc_zoom_single_product_summary', 11 );
+add_action( 'woocommerce_before_add_to_cart_button', 'wp_zoom_single_product_summary', 11 );
 
 /**
  * Populate global variable containing webinar data for current product
@@ -68,14 +68,14 @@ add_action( 'woocommerce_before_add_to_cart_button', 'wc_zoom_single_product_sum
  * @param WP_Query $wp_query Current query.
  * @return void
  */
-function wc_zoom_prepare_webinar_data( $post, $wp_query ) {
+function wp_zoom_prepare_webinar_data( $post, $wp_query ) {
 	if ( $wp_query->is_main_query() && ! isset( $GLOBALS['webinars'] ) ) {
 		$product = wc_get_product( $post );
 
-		$GLOBALS['webinars'] = wc_zoom_product_get_webinars( $product );
+		$GLOBALS['webinars'] = wp_zoom_product_get_webinars( $product );
 	}
 }
-add_action( 'the_post', 'wc_zoom_prepare_webinar_data', 5, 2 );
+add_action( 'the_post', 'wp_zoom_prepare_webinar_data', 5, 2 );
 
 /**
  * Add webinar registrant information to cart item data
@@ -85,22 +85,22 @@ add_action( 'the_post', 'wc_zoom_prepare_webinar_data', 5, 2 );
  * @param integer $variation_id Variation ID added to cart.
  * @return array
  */
-function wc_zoom_add_cart_item_data( $cart_item_data, $product_id, $variation_id ) {
+function wp_zoom_add_cart_item_data( $cart_item_data, $product_id, $variation_id ) {
 	if ( empty( $variation_id ) ) {
-		$webinars = wc_zoom_product_get_webinars( $product_id );
+		$webinars = wp_zoom_product_get_webinars( $product_id );
 
 		if ( empty( $webinars ) ) {
 			return $cart_item_data;
 		}
 
-		$cart_item_data['wc_zoom_webinars']             = $webinars;
-		$cart_item_data['wc_zoom_webinars_occurrences'] = array();
+		$cart_item_data['wp_zoom_webinars']             = $webinars;
+		$cart_item_data['wp_zoom_webinars_occurrences'] = array();
 
 		foreach ( $webinars as $webinar ) {
             // phpcs:ignore
-			$occurrence_id = $_POST['_wc_zoom_webinars_occurrences'][ $webinar['id'] ] ?? '';
+			$occurrence_id = $_POST['_wp_zoom_webinars_occurrences'][ $webinar['id'] ] ?? '';
 
-			$cart_item_data['wc_zoom_webinars_occurrences'][ $webinar['id'] ] = wc_zoom_get_available_webinar_occurrence( $webinar, (string) $occurrence_id );
+			$cart_item_data['wp_zoom_webinars_occurrences'][ $webinar['id'] ] = wp_zoom_get_available_webinar_occurrence( $webinar, (string) $occurrence_id );
 		}
 	} else {
 		// If variation.
@@ -108,7 +108,7 @@ function wc_zoom_add_cart_item_data( $cart_item_data, $product_id, $variation_id
 
 	return $cart_item_data;
 }
-add_filter( 'woocommerce_add_cart_item_data', 'wc_zoom_add_cart_item_data', 10, 3 );
+add_filter( 'woocommerce_add_cart_item_data', 'wp_zoom_add_cart_item_data', 10, 3 );
 
 /**
  * Verify occurrence selected is available.
@@ -119,9 +119,9 @@ add_filter( 'woocommerce_add_cart_item_data', 'wc_zoom_add_cart_item_data', 10, 
  * @param integer $variation_id Optional variation added to cart.
  * @return boolean
  */
-function wc_zoom_add_to_cart_validation( $passed, $product_id, $quantity, $variation_id = null ) {
+function wp_zoom_add_to_cart_validation( $passed, $product_id, $quantity, $variation_id = null ) {
 	if ( empty( $variation_id ) ) {
-		$webinars = wc_zoom_product_get_webinars( $product_id );
+		$webinars = wp_zoom_product_get_webinars( $product_id );
 
 		foreach ( $webinars as $webinar ) {
 			if ( empty( $webinar['occurrences'] ) ) {
@@ -129,16 +129,16 @@ function wc_zoom_add_to_cart_validation( $passed, $product_id, $quantity, $varia
 			}
 
             // phpcs:ignore
-			$occurrence_id = (string) $_POST['_wc_zoom_webinars_occurrences'][ $webinar['id'] ] ?? '';
+			$occurrence_id = (string) $_POST['_wp_zoom_webinars_occurrences'][ $webinar['id'] ] ?? '';
 
 			if ( empty( $occurrence_id ) ) {
-				wc_add_notice( esc_html__( 'Please select a date and time for each webinar.', 'wc-zoom' ), 'error' );
+				wc_add_notice( esc_html__( 'Please select a date and time for each webinar.', 'wp-zoom' ), 'error' );
 				$passed = false;
 			} else {
-				$available = wc_zoom_occurrence_available( $webinar, $occurrence_id );
+				$available = wp_zoom_occurrence_available( $webinar, $occurrence_id );
 
 				if ( ! $available ) {
-					wc_add_notice( esc_html__( 'Selected date and time is not available.', 'wc-zoom' ), 'error' );
+					wc_add_notice( esc_html__( 'Selected date and time is not available.', 'wp-zoom' ), 'error' );
 					$passed = false;
 				}
 			}
@@ -149,7 +149,7 @@ function wc_zoom_add_to_cart_validation( $passed, $product_id, $quantity, $varia
 
 	return $passed;
 }
-add_filter( 'woocommerce_add_to_cart_validation', 'wc_zoom_add_to_cart_validation', 10, 4 );
+add_filter( 'woocommerce_add_to_cart_validation', 'wp_zoom_add_to_cart_validation', 10, 4 );
 
 /**
  * Render webinar registrant information in cart table
@@ -158,11 +158,11 @@ add_filter( 'woocommerce_add_to_cart_validation', 'wc_zoom_add_to_cart_validatio
  * @param array $cart_item_data All cart item data.
  * @return array
  */
-function wc_zoom_get_item_data( $item_data, $cart_item_data ) {
-	if ( ! empty( $cart_item_data['wc_zoom_webinars'] ) ) {
-		foreach ( $cart_item_data['wc_zoom_webinars'] as $webinar ) {
+function wp_zoom_get_item_data( $item_data, $cart_item_data ) {
+	if ( ! empty( $cart_item_data['wp_zoom_webinars'] ) ) {
+		foreach ( $cart_item_data['wp_zoom_webinars'] as $webinar ) {
 			$start_time = $webinar['start_time'] ?? null;
-			$occurrence = $cart_item_data['wc_zoom_webinars_occurrences'][ $webinar['id'] ] ?? array();
+			$occurrence = $cart_item_data['wp_zoom_webinars_occurrences'][ $webinar['id'] ] ?? array();
 
 			// Check if webinar still exists; e.g. webinar could of been deleted and old data cached.
 			if ( ! isset( $webinar['topic'] ) ) {
@@ -172,45 +172,45 @@ function wc_zoom_get_item_data( $item_data, $cart_item_data ) {
 			$date_display = null;
 
 			if ( $start_time ) {
-				$date_display = wc_zoom_format_date_time( $start_time, $webinar['timezone'] );
+				$date_display = wp_zoom_format_date_time( $start_time, $webinar['timezone'] );
 			} elseif ( ! empty( $occurrence ) ) {
-				$date_display = wc_zoom_format_date_time( $occurrence['start_time'], $webinar['timezone'] );
+				$date_display = wp_zoom_format_date_time( $occurrence['start_time'], $webinar['timezone'] );
 			}
 
 			$item_data[] = array(
 				'key'       => esc_html( $webinar['topic'] ),
-				'value'     => esc_html( $date_display ?? __( 'Webinar has no fixed time.', 'wc-zoom' ) ),
+				'value'     => esc_html( $date_display ?? __( 'Webinar has no fixed time.', 'wp-zoom' ) ),
 			);
 		}
 	}
 
 	return $item_data;
 }
-add_filter( 'woocommerce_get_item_data', 'wc_zoom_get_item_data', 10, 2 );
+add_filter( 'woocommerce_get_item_data', 'wp_zoom_get_item_data', 10, 2 );
 
 /**
  * Check if cart items and their webinars are still valid
  *
  * @return boolean|WP_Error
  */
-function wc_zoom_check_cart_items() {
+function wp_zoom_check_cart_items() {
 	$return = true;
 
 	foreach ( WC()->cart->get_cart() as $cart_item_key => $values ) {
-		if ( ! isset( $values['wc_zoom_webinars'] ) ) {
+		if ( ! isset( $values['wp_zoom_webinars'] ) ) {
 			continue;
 		}
 
 		$product = $values['data'];
 
-		$webinars    = wc_zoom_product_get_webinars( $product->get_id() );
+		$webinars    = wp_zoom_product_get_webinars( $product->get_id() );
 		$webinar_ids = wp_list_pluck( $webinars, 'id' );
 
-		foreach ( $values['wc_zoom_webinars'] as $webinar ) {
+		foreach ( $values['wp_zoom_webinars'] as $webinar ) {
             // phpcs:ignore
 			if ( ! in_array( $webinar['id'], $webinar_ids ) ) {
 				WC()->cart->set_quantity( $cart_item_key, 0 );
-				wc_add_notice( __( 'A product in your cart contains a webinar which has been modified or no longer exists, therefore the product was removed from your cart.', 'wc-zoom' ), 'error' );
+				wc_add_notice( __( 'A product in your cart contains a webinar which has been modified or no longer exists, therefore the product was removed from your cart.', 'wp-zoom' ), 'error' );
 
 				$return = false;
 			}
@@ -219,7 +219,7 @@ function wc_zoom_check_cart_items() {
 
 	return $return;
 }
-add_action( 'woocommerce_check_cart_items', 'wc_zoom_check_cart_items' );
+add_action( 'woocommerce_check_cart_items', 'wp_zoom_check_cart_items' );
 
 /**
  * Add order line item meta
@@ -230,12 +230,12 @@ add_action( 'woocommerce_check_cart_items', 'wc_zoom_check_cart_items' );
  * @param WC_Order              $order Current order.
  * @return void
  */
-function wc_zoom_create_order_line_item( $item, $cart_item_key, $values, $order ) {
-	if ( isset( $values['wc_zoom_webinars'] ) ) {
-		foreach ( $values['wc_zoom_webinars'] as $webinar ) {
+function wp_zoom_create_order_line_item( $item, $cart_item_key, $values, $order ) {
+	if ( isset( $values['wp_zoom_webinars'] ) ) {
+		foreach ( $values['wp_zoom_webinars'] as $webinar ) {
 			$webinar_id = $webinar['id'] ?? '';
 			$start_time = $webinar['start_time'] ?? null;
-			$occurrence = $cart_item_data['wc_zoom_webinars_occurrences'][ $webinar['id'] ] ?? array();
+			$occurrence = $cart_item_data['wp_zoom_webinars_occurrences'][ $webinar['id'] ] ?? array();
 
 			// Check if webinar still exists; e.g. webinar could of been deleted and old data cached.
 			if ( ! isset( $webinar['topic'] ) ) {
@@ -245,20 +245,20 @@ function wc_zoom_create_order_line_item( $item, $cart_item_key, $values, $order 
 			$date_display = null;
 
 			if ( $start_time ) {
-				$date_display = wc_zoom_format_date_time( $start_time, $webinar['timezone'] );
+				$date_display = wp_zoom_format_date_time( $start_time, $webinar['timezone'] );
 			} elseif ( ! empty( $occurrence ) ) {
-				$date_display = wc_zoom_format_date_time( $occurrence['start_time'], $webinar['timezone'] );
+				$date_display = wp_zoom_format_date_time( $occurrence['start_time'], $webinar['timezone'] );
 
 				$item->add_meta_data( 'zoom_webinar_occurrence_id', $occurrence['occurrence_id'] );
 			}
 
 			$item->add_meta_data( 'zoom_webinar_id', $webinar_id );
 			$item->add_meta_data( 'zoom_webinar_topic', $webinar['topic'] );
-			$item->add_meta_data( 'zoom_webinar_datetime', $date_display ?? esc_html__( 'Webinar has no fixed time.', 'wc-zoom' ) );
+			$item->add_meta_data( 'zoom_webinar_datetime', $date_display ?? esc_html__( 'Webinar has no fixed time.', 'wp-zoom' ) );
 		}
 	}
 }
-add_action( 'woocommerce_checkout_create_order_line_item', 'wc_zoom_create_order_line_item', 10, 4 );
+add_action( 'woocommerce_checkout_create_order_line_item', 'wp_zoom_create_order_line_item', 10, 4 );
 
 
 
@@ -269,8 +269,8 @@ add_action( 'woocommerce_checkout_create_order_line_item', 'wc_zoom_create_order
  * @param WC_Order $order The order that was paid for.
  * @return void
  */
-function wc_zoom_payment_complete( $order_id, $order ) {
-	global $wc_zoom;
+function wp_zoom_payment_complete( $order_id, $order ) {
+	global $wp_zoom;
 
 	foreach ( $order->get_items() as $item ) {
 		if ( $item->is_type( 'line_item' ) ) {
@@ -279,7 +279,7 @@ function wc_zoom_payment_complete( $order_id, $order ) {
 			$topic         = null;
 			$datetime      = null;
 
-			foreach ( $item->get_meta_data( 'wc_zoom_webinars' ) as $meta_data ) {
+			foreach ( $item->get_meta_data( 'wp_zoom_webinars' ) as $meta_data ) {
 				if ( $meta_data->key === 'zoom_webinar_id' ) {
 					$webinar_id = $meta_data->value;
 				} elseif ( $meta_data->key === 'zoom_webinar_occurrence_id' ) {
@@ -296,18 +296,18 @@ function wc_zoom_payment_complete( $order_id, $order ) {
 			}
 
 			// Delete cache.
-			Cache::delete( 'wc_zoom_webinar_' . $webinar_id );
+			Cache::delete( 'wp_zoom_webinar_' . $webinar_id );
 
 			try {
-				$registration = $wc_zoom->add_webinar_registrant( $webinar_id, new \WC_Customer( $order->get_customer_id() ), $occurrence_id );
+				$registration = $wp_zoom->add_webinar_registrant( $webinar_id, new \WC_Customer( $order->get_customer_id() ), $occurrence_id );
 
 				// An error occurred.
 				if ( isset( $registration['message'] ) ) {
 					/* translators: 1: Webinar topic 2: Error message */
-					$order->add_order_note( sprintf( esc_html__( 'An error occurred while registering customer for %1$s: %2$s', 'wc-zoom' ), $topic, $registration['message'] ) );
+					$order->add_order_note( sprintf( esc_html__( 'An error occurred while registering customer for %1$s: %2$s', 'wp-zoom' ), $topic, $registration['message'] ) );
 				} else {
 					/* translators: 1: Webinar topic 2: Webinar date and time */
-					$order->add_order_note( sprintf( esc_html__( 'User successfully registered for %1$s (%2$s)', 'wc-zoom' ), $topic, $datetime ) );
+					$order->add_order_note( sprintf( esc_html__( 'User successfully registered for %1$s (%2$s)', 'wp-zoom' ), $topic, $datetime ) );
 				}
 			} catch ( \Exception $e ) {
 				$order->add_order_note( esc_html( $e->getMessage() ) );
@@ -315,4 +315,4 @@ function wc_zoom_payment_complete( $order_id, $order ) {
 		}
 	}
 }
-add_action( 'woocommerce_order_payment_status_changed', 'wc_zoom_payment_complete', 10, 2 );
+add_action( 'woocommerce_order_payment_status_changed', 'wp_zoom_payment_complete', 10, 2 );

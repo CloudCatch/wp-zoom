@@ -2,10 +2,10 @@
 /**
  * Cache class file
  *
- * @package SeattleWebCo\WCZoom
+ * @package SeattleWebCo\WPZoom
  */
 
-namespace SeattleWebCo\WCZoom;
+namespace SeattleWebCo\WPZoom;
 
 /**
  * Cache data for current request and as a transient
@@ -80,8 +80,8 @@ class Cache {
 		$wpdb->query(
 			"
 			DELETE FROM $wpdb->options
-			WHERE	option_name LIKE '_transient_timeout_wc_zoom%'
-			OR		option_name LIKE '_transient_wc_zoom%'
+			WHERE	option_name LIKE '_transient_timeout_wp_zoom%'
+			OR		option_name LIKE '_transient_wp_zoom%'
 		"
 		);
 	}

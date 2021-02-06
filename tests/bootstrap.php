@@ -34,9 +34,9 @@ function _manually_load_plugin() {
 
 	WC_Install::init();
 
-	require dirname( dirname( __FILE__ ) ) . '/wc-zoom.php';
+	require dirname( dirname( __FILE__ ) ) . '/wp-zoom.php';
 
-	\SeattleWebCo\WCZoom\wc_zoom_activation();
+	\SeattleWebCo\WPZoom\wp_zoom_activation();
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 

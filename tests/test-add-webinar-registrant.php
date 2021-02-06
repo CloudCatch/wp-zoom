@@ -2,7 +2,7 @@
 /**
  * TestAddWebinarRegistrant
  *
- * @package SeattleWebCo\WCZoom
+ * @package SeattleWebCo\WPZoom
  */
 
 /**
@@ -45,20 +45,20 @@ class TestAddWebinarRegistrant extends WP_UnitTestCase {
 			->getMock();
 		
 		
-		$GLOBALS['wc_zoom'] = $this->getMockBuilder('\SeattleWebCo\WCZoom\API')
+		$GLOBALS['wp_zoom'] = $this->getMockBuilder('\SeattleWebCo\WPZoom\API')
 			->setConstructorArgs(array($provider))
 			->getMock();
 		
 	}
 
 	public function test_registration_success() {
-		$GLOBALS['wc_zoom']->expects($this->once())
+		$GLOBALS['wp_zoom']->expects($this->once())
 			->method('add_webinar_registrant')
 			->will($this->returnValue(json_decode( '{"registrant_id":"culpa deserunt ea est commodo","id":"velit dolore minim Ut","topic":"et laboris Lorem in Ut","start_time":"1974-02-26T23:01:16.899Z","join_url":"pariatur"}', true)));
 
 		WC()->cart->empty_cart();
 		WC()->cart->add_to_cart( self::$simple_product->get_id(), 1, 0, array(), array( 
-			'wc_zoom_webinars'	=> array(
+			'wp_zoom_webinars'	=> array(
 				'test' => json_decode( $this->type_5_webinar, true )
 			)
 		) );
@@ -79,13 +79,13 @@ class TestAddWebinarRegistrant extends WP_UnitTestCase {
 	}
 	
 	public function test_registration_fail() {
-		$GLOBALS['wc_zoom']->expects($this->once())
+		$GLOBALS['wp_zoom']->expects($this->once())
 			->method('add_webinar_registrant')
 			->will($this->returnValue(json_decode( '{"code":1010,"message":"User does not belong to this account:{accountId}."}', true)));
 
 		WC()->cart->empty_cart();
 		WC()->cart->add_to_cart( self::$simple_product->get_id(), 1, 0, array(), array( 
-			'wc_zoom_webinars'	=> array(
+			'wp_zoom_webinars'	=> array(
 				'test' => json_decode( $this->type_5_webinar, true )
 			)
 		) );

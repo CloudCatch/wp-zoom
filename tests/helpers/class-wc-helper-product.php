@@ -2,7 +2,7 @@
 /**
  * Product helpers.
  *
- * @package SeattleWebCo\WCZoom
+ * @package SeattleWebCo\WPZoom
  */
 
 /**

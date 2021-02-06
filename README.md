@@ -1,3 +1,3 @@
 # Zoom for WordPress
 
-Sell virtual Zoom webinars with WordPress + WooCommerce
+Sell virtual Zoom webinars with WordPress + WordPress

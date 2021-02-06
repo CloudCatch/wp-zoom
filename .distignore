@@ -13,7 +13,7 @@
 /bin
 /phpunit.xml
 /bin
-/wc-zoom
+/wp-zoom
 
 # Files
 .babelrc

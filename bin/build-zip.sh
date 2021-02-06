@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PLUGIN_SLUG="wc-zoom"
+PLUGIN_SLUG="wp-zoom"
 PROJECT_PATH=$(pwd)
 BUILD_PATH="${PROJECT_PATH}/build"
 DEST_PATH="$BUILD_PATH/$PLUGIN_SLUG"
