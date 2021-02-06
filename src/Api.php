@@ -9,6 +9,7 @@ namespace SeattleWebCo\WPZoom;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessToken;
+use SeattleWebCo\WPZoom\Exception\InvalidTokenException;
 
 /**
  * Api class.
@@ -68,25 +69,59 @@ class Api {
 	 * @return AccessToken|string
 	 */
 	private function get_access_token() {
+		$tokens = get_option( 'wp_zoom_oauth_tokens', array() );
+
+		if ( empty( $tokens['access_token'] ) || empty( $tokens['refresh_token'] ) || empty( $tokens['expires'] ) ) {
+			return null;
+		}
+
+		if ( $tokens['expires'] <= time() ) {
+			$access_token = $this->provider->getAccessToken( 'refresh_token', array( 'refresh_token' => $tokens['refresh_token'] ) );
+
+			return $this->update_access_token( $access_token );
+		}
+
+		return new AccessToken( $tokens );
+	}
+
+	/**
+	 * Perform a request against the Zoom API
+	 *
+	 * @param string $uri Request endpoint.
+	 * @param string $method Request method.
+	 * @param mixed  $body Request body.
+	 * @param array  $headers Request headers.
+	 * @return mixed
+	 */
+	public function request( $uri, $method = 'GET', $body = null, $headers = array() ) {
 		try {
-			$tokens = get_option( 'wp_zoom_oauth_tokens', array() );
+			$access_token = $this->get_access_token();
 
-			if ( empty( $tokens['access_token'] ) || empty( $tokens['refresh_token'] ) || empty( $tokens['expires'] ) ) {
-				return null;
-			}
+			$request = $this->provider->getAuthenticatedRequest(
+				$method,
+				$uri,
+				$access_token,
+				array(
+					'headers' => $headers,
+					'body'    => $body,
+				)
+			);
 
-			if ( $tokens['expires'] <= time() ) {
-				$access_token = $this->provider->getAccessToken( 'refresh_token', array( 'refresh_token' => $tokens['refresh_token'] ) );
+			$response = $this->provider->getParsedResponse( $request );
 
-				return $this->update_access_token( $access_token );
-			}
+			return $response;
+		} catch ( InvalidTokenException $e ) {
+			delete_option( 'wp_zoom_oauth_tokens' );
+			delete_option( 'wp_zoom_user_id' );
 
-			return new AccessToken( $tokens );
+			Cache::delete_all();
+
+			do_action( 'wp_zoom_disconnected', $e );
 		} catch ( \Exception $e ) {
 			error_log( $e->getMessage() );
-
-			return '';
 		}
+
+		return array();
 	}
 
 	/**
@@ -95,22 +130,7 @@ class Api {
 	 * @return string
 	 */
 	public function get_me() {
-		try {
-			$request = $this->provider->getAuthenticatedRequest(
-				'GET',
-				$this->base_uri . '/users/me',
-				$this->get_access_token(),
-				array(
-					'headers' => array( 'Content-Type' => 'application/json;charset=UTF-8' ),
-				)
-			);
-
-			return $this->provider->getParsedResponse( $request );
-		} catch ( \Exception $e ) {
-			error_log( $e->getMessage() );
-
-			return wp_json_encode( array() );
-		}
+		return $this->request( $this->base_uri . '/users/me', 'GET', null, array( 'Content-Type' => 'application/json;charset=UTF-8' ) );
 	}
 
 	/**
@@ -129,16 +149,11 @@ class Api {
 			}
 		}
 
-		$request = $this->provider->getAuthenticatedRequest(
-			'GET',
-			$this->base_uri . '/webinars/' . $webinar_id,
-			$this->get_access_token(),
-			array(
-				'headers' => array( 'Content-Type' => 'application/json;charset=UTF-8' ),
-			)
-		);
+		$response = $this->request( $this->base_uri . '/webinars/' . $webinar_id, 'GET', null, array( 'Content-Type' => 'application/json;charset=UTF-8' ) );
 
-		$response = $this->provider->getParsedResponse( $request );
+		if ( empty( $response ) ) {
+			return $response;
+		}
 
 		Cache::set( 'wp_zoom_webinar_' . $webinar_id, $response, 'wp_zoom_webinars' );
 
@@ -160,16 +175,16 @@ class Api {
 			}
 		}
 
-		$request = $this->provider->getAuthenticatedRequest(
-			'GET',
+		$response = $this->request(
 			add_query_arg( array( 'page_size' => 300 ), $this->base_uri . '/users/' . $this->user_id . '/webinars' ),
-			$this->get_access_token(),
-			array(
-				'headers' => array( 'Content-Type' => 'application/json;charset=UTF-8' ),
-			)
+			'GET',
+			null,
+			array( 'Content-Type' => 'application/json;charset=UTF-8' )
 		);
 
-		$response = $this->provider->getParsedResponse( $request );
+		if ( empty( $response ) ) {
+			return $response;
+		}
 
 		Cache::set( 'wp_zoom_webinars', $response, 'wp_zoom_webinars' );
 
@@ -185,32 +200,27 @@ class Api {
 	 * @return array
 	 */
 	public function add_webinar_registrant( string $webinar_id, \WC_Customer $customer, string $occurrence_id = null ) {
-		$request = $this->provider->getAuthenticatedRequest(
-			'POST',
+		$response = $this->request(
 			add_query_arg( array( 'occurrence_ids' => $occurrence_id ), $this->base_uri . '/webinars/' . $webinar_id . '/registrants' ),
-			$this->get_access_token(),
-			array(
-				'headers' => array(
-					'headers' => array( 'Content-Type' => 'application/json;charset=UTF-8' ),
-				),
-				'body' => json_encode(
-					array(
-						'email'      => $customer->get_billing_email(),
-						'first_name' => $customer->get_first_name(),
-						'last_name'  => $customer->get_last_name(),
-						'address'    => $customer->get_billing_address(),
-						'city'       => $customer->get_billing_city(),
-						'country'    => $customer->get_billing_country(),
-						'zip'        => $customer->get_billing_postcode(),
-						'state'      => $customer->get_billing_state(),
-						'phone'      => $customer->get_billing_phone(),
-						'org'        => $customer->get_billing_company(),
-					)
-				),
-			)
+			'POST',
+			wp_json_encode(
+				array(
+					'email'      => $customer->get_billing_email(),
+					'first_name' => $customer->get_first_name(),
+					'last_name'  => $customer->get_last_name(),
+					'address'    => $customer->get_billing_address(),
+					'city'       => $customer->get_billing_city(),
+					'country'    => $customer->get_billing_country(),
+					'zip'        => $customer->get_billing_postcode(),
+					'state'      => $customer->get_billing_state(),
+					'phone'      => $customer->get_billing_phone(),
+					'org'        => $customer->get_billing_company(),
+				)
+			),
+			array( 'Content-Type' => 'application/json;charset=UTF-8' )
 		);
 
-		$response = $this->provider->getParsedResponse( $request );
+		do_action( 'wp_zoom_add_webinar_registrant_success', $response, $customer, $webinar_id, $occurrence_id );
 
 		return $response;
 	}

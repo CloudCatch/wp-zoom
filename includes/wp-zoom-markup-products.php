@@ -14,7 +14,7 @@ use SeattleWebCo\WPZoom\Cache;
  */
 function wp_zoom_single_product_summary() {
 	global $webinars;
-	
+
 	if ( ! empty( $webinars ) && is_array( $webinars ) ) {
 		?>
 
@@ -235,7 +235,7 @@ function wp_zoom_create_order_line_item( $item, $cart_item_key, $values, $order 
 		foreach ( $values['wp_zoom_webinars'] as $webinar ) {
 			$webinar_id = $webinar['id'] ?? '';
 			$start_time = $webinar['start_time'] ?? null;
-			$occurrence = $cart_item_data['wp_zoom_webinars_occurrences'][ $webinar['id'] ] ?? array();
+			$occurrence = $values['wp_zoom_webinars_occurrences'][ $webinar['id'] ] ?? array();
 
 			// Check if webinar still exists; e.g. webinar could of been deleted and old data cached.
 			if ( ! isset( $webinar['topic'] ) ) {
@@ -266,11 +266,17 @@ add_action( 'woocommerce_checkout_create_order_line_item', 'wp_zoom_create_order
  * Register the user to purchased webinars
  *
  * @param integer  $order_id ID or order paid for.
+ * @param string   $from Status transitioning from.
+ * @param string   $to Status transitioning to.
  * @param WC_Order $order The order that was paid for.
  * @return void
  */
-function wp_zoom_payment_complete( $order_id, $order ) {
+function wp_zoom_payment_complete( $order_id, $from, $to, $order ) {
 	global $wp_zoom;
+
+	if ( ! in_array( $to, wc_get_is_paid_statuses(), true ) ) {
+		return;
+	}
 
 	foreach ( $order->get_items() as $item ) {
 		if ( $item->is_type( 'line_item' ) ) {
@@ -298,21 +304,53 @@ function wp_zoom_payment_complete( $order_id, $order ) {
 			// Delete cache.
 			Cache::delete( 'wp_zoom_webinar_' . $webinar_id );
 
-			try {
-				$registration = $wp_zoom->add_webinar_registrant( $webinar_id, new \WC_Customer( $order->get_customer_id() ), $occurrence_id );
+			$registration = $wp_zoom->add_webinar_registrant( $webinar_id, new \WC_Customer( $order->get_customer_id() ), $occurrence_id );
 
 				// An error occurred.
-				if ( isset( $registration['message'] ) ) {
-					/* translators: 1: Webinar topic 2: Error message */
-					$order->add_order_note( sprintf( esc_html__( 'An error occurred while registering customer for %1$s: %2$s', 'wp-zoom' ), $topic, $registration['message'] ) );
-				} else {
-					/* translators: 1: Webinar topic 2: Webinar date and time */
-					$order->add_order_note( sprintf( esc_html__( 'User successfully registered for %1$s (%2$s)', 'wp-zoom' ), $topic, $datetime ) );
-				}
-			} catch ( \Exception $e ) {
-				$order->add_order_note( esc_html( $e->getMessage() ) );
+			if ( isset( $registration['registrant_id'] ) ) {
+				/* translators: 1: Webinar topic 2: Webinar date and time */
+				$order->add_order_note( sprintf( esc_html__( 'User successfully registered for %1$s (%2$s)', 'wp-zoom' ), $topic, $datetime ) );
+
+				add_post_meta(
+					$order_id,
+					'_zoom_webinar_registration',
+					$registration
+				);
+
+			} else {
+				/* translators: 1: Webinar topic */
+				$order->add_order_note( sprintf( esc_html__( 'An error occurred while registering customer for %1$s', 'wp-zoom' ), $topic ) );
+
 			}
 		}
 	}
 }
-add_action( 'woocommerce_order_payment_status_changed', 'wp_zoom_payment_complete', 10, 2 );
+add_action( 'woocommerce_order_status_changed', 'wp_zoom_payment_complete', 10, 4 );
+
+/**
+ * Display label of order item
+ *
+ * @param string             $display_key Display label.
+ * @param WC_Order_Item_Meta $meta Order item meta.
+ * @param WC_Order_Item      $item Order item object.
+ * @return string
+ */
+function wp_zoom_order_item_display_label( $display_key, $meta, $item ) {
+	switch ( $display_key ) {
+		case 'zoom_webinar_id':
+			$display_key = esc_html__( 'Zoom Webinar ID', 'wp-zoom' );
+			break;
+		case 'zoom_webinar_occurrence_id':
+			$display_key = esc_html__( 'Zoom Webinar Occurrence ID', 'wp-zoom' );
+			break;
+		case 'zoom_webinar_topic':
+			$display_key = esc_html__( 'Zoom Webinar Topic', 'wp-zoom' );
+			break;
+		case 'zoom_webinar_datetime':
+			$display_key = esc_html__( 'Zoom Webinar Date & Time', 'wp-zoom' );
+			break;
+	}
+
+	return $display_key;
+}
+add_filter( 'woocommerce_order_item_display_meta_key', 'wp_zoom_order_item_display_label', 10, 3 );

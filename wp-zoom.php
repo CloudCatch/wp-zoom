@@ -27,6 +27,7 @@ require_once 'includes/wp-zoom-enqueue-scripts.php';
 require_once 'includes/wp-zoom-integration-settings.php';
 require_once 'includes/wp-zoom-product-meta-boxes.php';
 require_once 'includes/wp-zoom-markup-products.php';
+require_once 'includes/wp-zoom-api-functions.php';
 require_once 'includes/wp-zoom-markup-functions.php';
 require_once 'includes/wp-zoom-helper-functions.php';
 

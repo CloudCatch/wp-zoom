@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zoom for WordPress 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-zoom\n"
-"POT-Creation-Date: 2021-02-06 14:55:39+00:00\n"
+"POT-Creation-Date: 2021-02-06 16:24:25+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,132 +13,118 @@ msgstr ""
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "X-Generator: node-wp-i18n 1.2.4\n"
 
-#: build/wc-zoom/includes/wc-zoom-markup-functions.php:21
 #: includes/wp-zoom-markup-functions.php:21
 msgid "Select Webinar"
 msgstr ""
 
-#: build/wc-zoom/includes/wc-zoom-markup-functions.php:62
 #: includes/wp-zoom-markup-functions.php:62
 msgid "Select Date & Time"
 msgstr ""
 
-#: build/wc-zoom/includes/wc-zoom-markup-functions.php:93
 #: includes/wp-zoom-markup-functions.php:93
 msgid "No available dates and times"
 msgstr ""
 
-#: build/wc-zoom/includes/wc-zoom-markup-products.php:38
 #: includes/wp-zoom-markup-products.php:38
 msgid "Recurring webinar"
 msgstr ""
 
-#: build/wc-zoom/includes/wc-zoom-markup-products.php:135
 #: includes/wp-zoom-markup-products.php:135
 msgid "Please select a date and time for each webinar."
 msgstr ""
 
-#: build/wc-zoom/includes/wc-zoom-markup-products.php:141
 #: includes/wp-zoom-markup-products.php:141
 msgid "Selected date and time is not available."
 msgstr ""
 
-#: build/wc-zoom/includes/wc-zoom-markup-products.php:182
-#: build/wc-zoom/includes/wc-zoom-markup-products.php:257
 #: includes/wp-zoom-markup-products.php:182
 #: includes/wp-zoom-markup-products.php:257
 msgid "Webinar has no fixed time."
 msgstr ""
 
-#: build/wc-zoom/includes/wc-zoom-markup-products.php:213
 #: includes/wp-zoom-markup-products.php:213
 msgid ""
 "A product in your cart contains a webinar which has been modified or no "
 "longer exists, therefore the product was removed from your cart."
 msgstr ""
 
-#: build/wc-zoom/includes/wc-zoom-markup-products.php:307
 #: includes/wp-zoom-markup-products.php:307
 #. translators: 1: Webinar topic 2: Error message
 msgid "An error occurred while registering customer for %1$s: %2$s"
 msgstr ""
 
-#: build/wc-zoom/includes/wc-zoom-markup-products.php:310
 #: includes/wp-zoom-markup-products.php:310
 #. translators: 1: Webinar topic 2: Webinar date and time
 msgid "User successfully registered for %1$s (%2$s)"
 msgstr ""
 
-#: build/wc-zoom/includes/wc-zoom-product-meta-boxes.php:11
-#: build/wc-zoom/src/Settings.php:17 includes/wp-zoom-product-meta-boxes.php:11
-#: src/Settings.php:17
+#: includes/wp-zoom-product-meta-boxes.php:11 src/Settings.php:17
 msgid "Zoom"
 msgstr ""
 
-#: build/wc-zoom/includes/wc-zoom-product-meta-boxes.php:31
-#: build/wc-zoom/includes/wc-zoom-product-meta-boxes.php:66
 #: includes/wp-zoom-product-meta-boxes.php:31
 #: includes/wp-zoom-product-meta-boxes.php:66
 msgid "Webinars"
 msgstr ""
 
-#: build/wc-zoom/includes/wc-zoom-product-meta-boxes.php:37
-#: build/wc-zoom/includes/wc-zoom-product-meta-boxes.php:73
 #: includes/wp-zoom-product-meta-boxes.php:37
 #: includes/wp-zoom-product-meta-boxes.php:73
 msgid "Select"
 msgstr ""
 
-#: build/wc-zoom/src/Settings.php:18
-msgid "Integrate Zoom with WooCommerce to ease selling webinars seamlessly."
+#: src/Settings.php:18
+msgid "Integrate Zoom with WordPress to ease selling webinars seamlessly."
 msgstr ""
 
-#: build/wc-zoom/src/Settings.php:43 build/wc-zoom/src/Settings.php:60
-#: build/wc-zoom/src/Settings.php:85 src/Settings.php:43 src/Settings.php:60
-#: src/Settings.php:85
+#: src/Settings.php:43 src/Settings.php:60 src/Settings.php:85
 msgid "You do not have permission to do that."
 msgstr ""
 
-#: build/wc-zoom/src/Settings.php:48 build/wc-zoom/src/Settings.php:65
-#: build/wc-zoom/src/Settings.php:90 src/Settings.php:48 src/Settings.php:65
-#: src/Settings.php:90
+#: src/Settings.php:48 src/Settings.php:65 src/Settings.php:90
 msgid "Invalid nonce, please try again."
 msgstr ""
 
-#: build/wc-zoom/src/Settings.php:101 src/Settings.php:101
+#: src/Settings.php:101
 msgid "Cache purged successfully."
 msgstr ""
 
-#: build/wc-zoom/src/Settings.php:136 src/Settings.php:136
+#: src/Settings.php:136
 msgid "The following error was received during authorization"
 msgstr ""
 
-#: build/wc-zoom/src/Settings.php:166 src/Settings.php:166
+#: src/Settings.php:166
 msgid "Authorize with"
 msgstr ""
 
-#: build/wc-zoom/src/Settings.php:176 src/Settings.php:176
+#: src/Settings.php:176
 msgid "Connected to account: %s"
 msgstr ""
 
-#: build/wc-zoom/src/Settings.php:180 src/Settings.php:180
+#: src/Settings.php:180
 msgid "Revoke Zoom Authorization"
 msgstr ""
 
-#: build/wc-zoom/src/Settings.php:183 src/Settings.php:183
+#: src/Settings.php:183
 msgid "Purge Zoom API Cache"
 msgstr ""
 
-#: build/wc-zoom/wc-zoom.php:97 wc-zoom.php:97
+#: src/Zoom.php:109 src/Zoom.php:180
+#. translators: 1: Response message
+#. translators: 1: Response reason
+msgid "Unable to retrieve access token from server: %s"
+msgstr ""
+
+#: src/Zoom.php:118
+#. translators: 1: Response message 2: Errors if set
+msgid "Error recieved from Zoom API: %1$s %2$s"
+msgstr ""
+
+#: wp-zoom.php:97
 msgid "This plugin requires a minimum PHP version of 7.0.0"
 msgstr ""
 
-#: build/wc-zoom/wc-zoom.php:98 wc-zoom.php:98
+#: wp-zoom.php:98
 msgid "Plugin activation error"
-msgstr ""
-
-#: src/Settings.php:18
-msgid "Integrate Zoom with WordPress to ease selling webinars seamlessly."
 msgstr ""
 
 #. Plugin Name of the plugin/theme

@@ -32,14 +32,16 @@ function wp_zoom_render_field_select_webinars( array $args = array() ) {
 		<?php echo $args['multiple'] ? 'multiple' : ''; ?>
 		placeholder="<?php echo esc_attr( $args['placeholder'] ); ?>"
 		class="wp-zoom-webinars-field"
-	>
-		<?php foreach ( $webinars['webinars'] as $webinar ) { ?>
+	>	
+		<?php if ( ! empty( $webinars['webinars'] ) ) { ?>
+			<?php foreach ( $webinars['webinars'] as $webinar ) { ?>
 
-			<?php // phpcs:ignore ?>
-			<option <?php selected( in_array( $webinar['id'], $args['selected'] ), true ); ?> value="<?php echo esc_attr( $webinar['id'] ); ?>">
-				<?php echo esc_html( $webinar['topic'] ); ?>
-			</option>
+				<?php // phpcs:ignore ?>
+				<option <?php selected( in_array( $webinar['id'], $args['selected'] ), true ); ?> value="<?php echo esc_attr( $webinar['id'] ); ?>">
+					<?php echo esc_html( $webinar['topic'] ); ?>
+				</option>
 
+			<?php } ?>
 		<?php } ?>
 	</select>
 
