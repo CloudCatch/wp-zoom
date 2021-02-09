@@ -9,6 +9,7 @@
 /node_modules
 /tests
 /build
+/resources
 /coverage
 /bin
 /phpunit.xml
@@ -24,12 +25,14 @@
 .eslintrc.json
 .gitattributes
 .gitignore
+.prettierignore
 .releaserc.js
 .stylelintignore
 .stylelintrc.json
 .travis.yml
 .phpcs.xml.dist
 .env
+.DS_Store
 CHANGELOG.md
 CODE_OF_CONDUCT.md
 CONTRIBUTING.md

@@ -24,7 +24,7 @@ require_once 'helpers/class-wc-helper-product.php';
 require_once 'helpers/class-wc-helper-customer.php';
 
 // Include mocks.
-require_once 'mocks/class-zoom-mock-api.php';
+//require_once 'mocks/class-zoom-mock-api.php';
 
 /**
  * Manually load the plugin being tested.

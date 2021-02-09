@@ -49,6 +49,32 @@ function wp_zoom_render_field_select_webinars( array $args = array() ) {
 }
 
 /**
+ * Render field which displays webinar info/field
+ *
+ * @param array $webinar Webinar data.
+ * @param array $args <select> field arguments.
+ * @return void
+ */
+function wp_zoom_render_field_webinar( array $webinar, array $args = array() ) {
+	switch ( $webinar['type'] ) {
+		// Normal webinar with start time.
+		case '5':
+			echo esc_html( wp_zoom_format_date_time( $webinar['start_time'] ) );
+			break;
+
+		// Recurring webinar with no fixed time.
+		case '6':
+			esc_html_e( 'Recurring webinar', 'wp-zoom' );
+			break;
+
+		// Recurring webinar with fixed time.
+		case '9':
+			wp_zoom_render_field_select_webinar_occurrence( $webinar, $args );
+			break;
+	}
+}
+
+/**
  * Render field which displays available webinar occurrences
  *
  * @param array $webinar Webinar containing occurrences.
@@ -84,7 +110,7 @@ function wp_zoom_render_field_select_webinar_occurrence( array $webinar, array $
 					value="<?php echo esc_attr( $occurrence['occurrence_id'] ); ?>"
 					<?php echo esc_attr( $occurrence['status'] !== 'available' ? 'disabled' : '' ); ?>
 				>
-					<?php echo esc_html( wp_zoom_format_date_time( $occurrence['start_time'], $webinar['timezone'] ) ); ?>
+					<?php echo esc_html( wp_zoom_format_date_time( $occurrence['start_time'] ) ); ?>
 				</option>
 			<?php } ?>``
 

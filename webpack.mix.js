@@ -9,18 +9,17 @@
  */
 
 // Import required packages.
-const mix = require('laravel-mix');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const mix = require("laravel-mix");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
-require('laravel-mix-polyfill');
-require('laravel-mix-svg-sprite');
+require("laravel-mix-polyfill");
+require("laravel-mix-svg-sprite");
 
 /*
  * Disable all notifications.
  */
 
 mix.disableNotifications();
-
 
 /*
  * -----------------------------------------------------------------------------
@@ -36,14 +35,14 @@ mix.disableNotifications();
  * Sets the development path to assets. By default, this is the `/resources`
  * folder in the theme.
  */
-const devPath = 'resources';
-const distPath = 'assets';
+const devPath = "resources";
+const distPath = "assets";
 
 /*
  * Sets the path to the generated assets. By default, this is the root folder in
  * the theme. If doing something custom, make sure to change this everywhere.
  */
-mix.setPublicPath('./');
+mix.setPublicPath("./");
 
 /*
  * Set Laravel Mix options.
@@ -52,8 +51,8 @@ mix.setPublicPath('./');
  * @link https://laravel.com/docs/5.6/mix#url-processing
  */
 mix.options({
-    postCss: [require('postcss-preset-env')()],
-    processCssUrls: false
+  postCss: [require("postcss-preset-env")()],
+  processCssUrls: false,
 });
 
 /*
@@ -78,7 +77,8 @@ mix.version();
  * @link https://laravel.com/docs/5.6/mix#working-with-scripts
  */
 mix
-    .js(`${devPath}/js/admin.js`, `${distPath}/js/admin.js`);
+  .js(`${devPath}/js/admin.js`, `${distPath}/js/admin.js`)
+  .js(`${devPath}/js/frontend.js`, `${distPath}/js/frontend.js`);
 
 /*
  * Compile CSS. Mix supports Sass, Less, Stylus, and plain CSS, and has functions
@@ -91,35 +91,47 @@ mix
 
 // Sass configuration.
 var sassConfig = {
-    outputStyle: 'compressed',
-    indentType: 'tab',
-    indentWidth: 1
+  outputStyle: "compressed",
+  indentType: "tab",
+  indentWidth: 1,
 };
 
 // Compile SASS/CSS.
 mix
-    .sass(`${devPath}/scss/admin.scss`, `${distPath}/css/admin.css`, sassConfig).options({
+  .sass(`${devPath}/scss/admin.scss`, `${distPath}/css/admin.css`, sassConfig)
+  .options({
     postCss: [
-        require('cssnano')({
-            preset: ['default', {
-                discardComments: {
-                    removeAll: true,
-                },
-            }]
-        })
-    ]
-})
-    .sass(`${devPath}/scss/frontend.scss`, `${distPath}/css/frontend.css`, sassConfig).options({
+      require("cssnano")({
+        preset: [
+          "default",
+          {
+            discardComments: {
+              removeAll: true,
+            },
+          },
+        ],
+      }),
+    ],
+  })
+  .sass(
+    `${devPath}/scss/frontend.scss`,
+    `${distPath}/css/frontend.css`,
+    sassConfig
+  )
+  .options({
     postCss: [
-        require('cssnano')({
-            preset: ['default', {
-                discardComments: {
-                    removeAll: true,
-                },
-            }]
-        })
-    ]
-});
+      require("cssnano")({
+        preset: [
+          "default",
+          {
+            discardComments: {
+              removeAll: true,
+            },
+          },
+        ],
+      }),
+    ],
+  });
 
 /*
  * Add custom Webpack configuration.
@@ -132,36 +144,33 @@ mix
  * @link https://webpack.js.org/configuration/
  */
 mix.webpackConfig({
-    stats: 'minimal',
-    performance: {hints: false},
-    externals: {jquery: 'jQuery'},
-    plugins: [
-        // @link https://github.com/webpack-contrib/copy-webpack-plugin
-        new CopyWebpackPlugin([
-            {from: `${devPath}/fonts`, to: `${distPath}/fonts`}
-        ]),
-    ]
+  stats: "minimal",
+  performance: { hints: false },
+  externals: { jquery: "jQuery" },
+  plugins: [
+    // @link https://github.com/webpack-contrib/copy-webpack-plugin
+    new CopyWebpackPlugin([
+      { from: `${devPath}/fonts`, to: `${distPath}/fonts` },
+    ]),
+  ],
 });
 
 if (process.env.sync) {
-
-    /*
-     * Monitor files for changes and inject your changes into the browser.
-     *
-     * @link https://laravel.com/docs/5.6/mix#browsersync-reloading
-     */
-    mix.browserSync({
-        notify: false,
-        proxy: process.env.MIX_PROXY,
-        host: process.env.MIX_HOST,
-        open: 'external',
-        port: process.env.MIX_PORT,
-        https: {
-            'key': process.env.MIX_KEY,
-            'cert': process.env.MIX_CRT
-        },
-        files: [
-            `${devPath}/**/*`,
-        ]
-    });
+  /*
+   * Monitor files for changes and inject your changes into the browser.
+   *
+   * @link https://laravel.com/docs/5.6/mix#browsersync-reloading
+   */
+  mix.browserSync({
+    notify: false,
+    proxy: process.env.MIX_PROXY,
+    host: process.env.MIX_HOST,
+    open: "external",
+    port: process.env.MIX_PORT,
+    https: {
+      key: process.env.MIX_KEY,
+      cert: process.env.MIX_CRT,
+    },
+    files: [`${devPath}/**/*`],
+  });
 }

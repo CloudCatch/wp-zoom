@@ -64,6 +64,78 @@ class TestAddWebinarRegistrant extends WP_UnitTestCase {
 		) );
 		$checkout = WC_Checkout::instance();
 
+		update_option( 'timezone_string', 'America/New_York' );
+
+		$order = wc_create_order();
+		$order->set_customer_id( self::$customer->get_id() );
+		$checkout->set_data_from_cart( $order );
+		$order->set_status( 'pending' );
+		$order->save();
+
+		$complete = $order->payment_complete( '123' );
+
+		$notes = wp_list_pluck( wc_get_order_notes( array( 'order_id' => $order->get_id() ) ), 'content' );
+
+		$this->assertTrue( $complete );
+		$this->assertContains( 'User successfully registered for Test Webinar (Thursday, August 30th, 2040 at 5:00pm EST)', $notes );
+	}
+
+	public function test_registration_type_9_success() {
+		$GLOBALS['wp_zoom']->expects($this->once())
+			->method('add_webinar_registrant')
+			->will($this->returnValue(json_decode( '{"registrant_id":"culpa deserunt ea est commodo","id":"velit dolore minim Ut","topic":"et laboris Lorem in Ut","start_time":"1974-02-26T23:01:16.899Z","join_url":"pariatur"}', true)));
+
+		WC()->cart->empty_cart();
+		WC()->cart->add_to_cart( self::$simple_product->get_id(), 1, 0, array(), array( 
+			'wp_zoom_webinars'	=> array(
+				'test' => json_decode( $this->type_9_webinar, true ),
+			),
+			'wp_zoom_webinars_occurrences' => array( '26733991893' => json_decode( '{"occurrence_id":"1612364400000","start_time":"2040-02-03T15:00:00Z","duration":180,"status":"available"}', true ) )
+		) );
+
+		$checkout = WC_Checkout::instance();
+
+		update_option( 'timezone_string', 'America/New_York' );
+
+		$order = wc_create_order();
+		$order->set_customer_id( self::$customer->get_id() );
+		$checkout->set_data_from_cart( $order );
+		$order->save();
+
+		$complete = $order->payment_complete( '123' );
+
+		$notes = wp_list_pluck( wc_get_order_notes( array( 'order_id' => $order->get_id() ) ), 'content' );
+
+		$this->assertTrue( $complete );
+		$this->assertContains( 'User successfully registered for Sample Webinar (Friday, February 3rd, 2040 at 10:00am EST)', $notes );
+	}
+
+	public function test_registration_multiple_success() {
+		$GLOBALS['wp_zoom']->expects($this->exactly(2))
+			->method('add_webinar_registrant')
+			->will($this->returnValue(json_decode( '{"registrant_id":"culpa deserunt ea est commodo","id":"velit dolore minim Ut","topic":"et laboris Lorem in Ut","start_time":"1974-02-26T23:01:16.899Z","join_url":"pariatur"}', true)));
+
+		WC()->cart->empty_cart();
+		WC()->cart->add_to_cart( self::$simple_product->get_id(), 1, 0, array(), array( 
+			'wp_zoom_webinars'	=> array(
+				'test' => json_decode( $this->type_5_webinar, true )
+			)
+		) );
+
+		$simple_product_2 = WC_Helper_Product::create_simple_product();
+		$simple_product_2->set_regular_price( 10.00 );
+		$simple_product_2->save();
+
+		WC()->cart->add_to_cart( $simple_product_2->get_id(), 1, 0, array(), array( 
+			'wp_zoom_webinars'	=> array(
+				'test' => json_decode( $this->type_6_webinar, true )
+			)
+		) );
+
+		$checkout = WC_Checkout::instance();
+
+		update_option( 'timezone_string', 'America/New_York' );
+
 		$order = wc_create_order();
 		$order->set_customer_id( self::$customer->get_id() );
 		$checkout->set_data_from_cart( $order );
@@ -102,6 +174,6 @@ class TestAddWebinarRegistrant extends WP_UnitTestCase {
 		$notes = wp_list_pluck( wc_get_order_notes( array( 'order_id' => $order->get_id() ) ), 'content' );
 
 		$this->assertTrue( $complete );
-		$this->assertContains( 'An error occurred while registering customer for Test Webinar: User does not belong to this account:{accountId}.', $notes );
+		$this->assertContains( 'An error occurred while registering customer for Test Webinar', $notes );
 	}
 }

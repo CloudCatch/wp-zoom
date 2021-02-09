@@ -10,8 +10,11 @@
  *
  * @return void
  */
-function wp_zoom_load_integration() {
+function wp_zoom_load_woocommerce_integration() {
 	if ( class_exists( '\WC_Integration' ) ) {
+		require_once 'woocommerce/wp-zoom-woocommerce-product-meta-boxes.php';
+		require_once 'woocommerce/wp-zoom-woocommerce-markup-products.php';
+
 		add_filter(
 			'woocommerce_integrations',
 			function( $integrations ) {
@@ -22,4 +25,4 @@ function wp_zoom_load_integration() {
 		);
 	}
 }
-add_action( 'plugins_loaded', 'wp_zoom_load_integration' );
+add_action( 'plugins_loaded', 'wp_zoom_load_woocommerce_integration' );

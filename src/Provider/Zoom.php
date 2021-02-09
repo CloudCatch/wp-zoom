@@ -5,7 +5,7 @@
  * @package SeattleWebCo\WPZoom
  */
 
-namespace SeattleWebCo\WPZoom;
+namespace SeattleWebCo\WPZoom\Provider;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 
@@ -54,7 +54,7 @@ class Zoom extends AbstractProvider {
 	 * @return string
 	 */
 	public function getBaseAuthorizationUrl() {
-		return 'https://api.seattlewebco.com/oauth?provider=zoom';
+		return 'https://zoom.us/oauth/authorize';
 	}
 
 	/**
@@ -64,7 +64,7 @@ class Zoom extends AbstractProvider {
 	 * @return string
 	 */
 	public function getBaseAccessTokenUrl( array $params ) {
-		return 'https://api.seattlewebco.com/oauth/token?provider=zoom';
+		return 'https://zoom.us/oauth/token';
 	}
 
 	/**
@@ -114,10 +114,9 @@ class Zoom extends AbstractProvider {
 
 			throw new ApiRequestException(
 				sprintf(
-					/* translators: 1: Response message 2: Errors if set */
-					__( 'Error recieved from Zoom API: %1$s %2$s', 'wp-zoom' ),
-					$data['message'],
-					isset( $data['errors'] ) ? wp_json_encode( $data['errors'] ) : ''
+					/* translators: 1: Response message */
+					__( 'Error recieved from Zoom API: %1$s', 'wp-zoom' ),
+					wp_json_encode( $data )
 				)
 			);
 		}

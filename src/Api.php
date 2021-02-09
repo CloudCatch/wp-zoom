@@ -23,10 +23,25 @@ class Api {
 	 */
 	public $base_uri = 'https://api.zoom.us/v2';
 
+	/**
+	 * Currently authenticated user ID
+	 *
+	 * @var integer
+	 */
 	public $user_id;
 
+	/**
+	 * OAuth 2 provider
+	 *
+	 * @var AbstractProvider
+	 */
 	public $provider;
 
+	/**
+	 * Init
+	 *
+	 * @param AbstractProvider $provider OAuth 2 provider.
+	 */
 	public function __construct( AbstractProvider $provider ) {
 		$this->provider = $provider;
 
@@ -118,7 +133,7 @@ class Api {
 
 			do_action( 'wp_zoom_disconnected', $e );
 		} catch ( \Exception $e ) {
-			error_log( $e->getMessage() );
+			Log::write( $e->getMessage() );
 		}
 
 		return array();
@@ -192,35 +207,54 @@ class Api {
 	}
 
 	/**
-	 * Register customer for a webinar
+	 * Get questions for webinar
 	 *
-	 * @param string       $webinar_id The webinar ID.
-	 * @param \WC_Customer $customer The customer to register.
-	 * @param string       $occurrence_id The webinar occurrence if applicable.
+	 * @param string  $webinar_id The webinar ID.
+	 * @param boolean $cached Retrieve cached results or not.
 	 * @return array
 	 */
-	public function add_webinar_registrant( string $webinar_id, \WC_Customer $customer, string $occurrence_id = null ) {
+	public function get_webinar_registrant_questions( string $webinar_id, bool $cached = true ) {
+		if ( $cached ) {
+			$cache = Cache::get( 'wp_zoom_webinar_' . $webinar_id . '_questions' );
+
+			if ( false !== $cache ) {
+				return $cache;
+			}
+		}
+
 		$response = $this->request(
-			add_query_arg( array( 'occurrence_ids' => $occurrence_id ), $this->base_uri . '/webinars/' . $webinar_id . '/registrants' ),
-			'POST',
-			wp_json_encode(
-				array(
-					'email'      => $customer->get_billing_email(),
-					'first_name' => $customer->get_first_name(),
-					'last_name'  => $customer->get_last_name(),
-					'address'    => $customer->get_billing_address(),
-					'city'       => $customer->get_billing_city(),
-					'country'    => $customer->get_billing_country(),
-					'zip'        => $customer->get_billing_postcode(),
-					'state'      => $customer->get_billing_state(),
-					'phone'      => $customer->get_billing_phone(),
-					'org'        => $customer->get_billing_company(),
-				)
-			),
+			$this->base_uri . '/webinars/' . $webinar_id . '/registrants/questions',
+			'GET',
+			null,
 			array( 'Content-Type' => 'application/json;charset=UTF-8' )
 		);
 
-		do_action( 'wp_zoom_add_webinar_registrant_success', $response, $customer, $webinar_id, $occurrence_id );
+		if ( empty( $response ) ) {
+			return $response;
+		}
+
+		Cache::set( 'wp_zoom_webinar_' . $webinar_id . '_questions', $response, 'wp_zoom_webinars' );
+
+		return $response;
+	}
+
+	/**
+	 * Register customer for a webinar
+	 *
+	 * @param string $webinar_id The webinar ID.
+	 * @param array  $registrant_data The registrant data to POST.
+	 * @param string $occurrence_id The webinar occurrence if applicable.
+	 * @return array
+	 */
+	public function add_webinar_registrant( string $webinar_id, array $registrant_data, string $occurrence_id = null ) {
+		$response = $this->request(
+			add_query_arg( array( 'occurrence_ids' => $occurrence_id ), $this->base_uri . '/webinars/' . $webinar_id . '/registrants' ),
+			'POST',
+			wp_json_encode( $registrant_data ),
+			array( 'Content-Type' => 'application/json;charset=UTF-8' )
+		);
+
+		do_action( 'wp_zoom_add_webinar_registrant_success', $response, $registrant_data, $webinar_id, $occurrence_id );
 
 		return $response;
 	}

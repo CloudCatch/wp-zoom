@@ -16,6 +16,10 @@
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "valeryanm.vscode-phpsab"
     },
+    "[js]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
     "intelephense.stubs": [
         "apache",
         "redis",

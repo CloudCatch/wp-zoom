@@ -5,7 +5,12 @@
  * @package SeattleWebCo\WPZoom
  */
 
-
+/**
+ * Zoom product data tab for simple products
+ *
+ * @param array $tabs Tabs to modify.
+ * @return array
+ */
 function wp_zoom_product_data_tab( $tabs ) {
 	$tabs['wp-zoom'] = array(
 		'label'    => __( 'Zoom', 'wp-zoom' ),
@@ -18,7 +23,11 @@ function wp_zoom_product_data_tab( $tabs ) {
 }
 add_filter( 'woocommerce_product_data_tabs', 'wp_zoom_product_data_tab' );
 
-
+/**
+ * Webinar dropdown for simple products
+ *
+ * @return void
+ */
 function wp_zoom_product_data_tab_content() {
 	global $post;
 
@@ -46,6 +55,13 @@ function wp_zoom_product_data_tab_content() {
 }
 add_action( 'woocommerce_product_data_panels', 'wp_zoom_product_data_tab_content' );
 
+/**
+ * Save product webinars
+ *
+ * @param integer $id Current product ID.
+ * @param WP_Post $post Current product.
+ * @return void
+ */
 function wp_zoom_product_data_save( $id, $post ) {
 	// phpcs:ignore
 	$webinars = $_POST['_wp_zoom_webinars'] ?? null;
@@ -56,7 +72,14 @@ function wp_zoom_product_data_save( $id, $post ) {
 }
 add_action( 'woocommerce_process_product_meta', 'wp_zoom_product_data_save', 10, 2 );
 
-
+/**
+ * Webinar dropdown field for variations
+ *
+ * @param integer              $loop Current variation index.
+ * @param array                $variation_data Variation data.
+ * @param WC_Product_Variation $variation Current variation.
+ * @return void
+ */
 function wp_zoom_variable_product_fields( $loop, $variation_data, $variation ) {
 	$selected = (array) get_post_meta( $variation->ID, '_wp_zoom_webinars', true );
 	?>
@@ -81,6 +104,12 @@ function wp_zoom_variable_product_fields( $loop, $variation_data, $variation ) {
 }
 add_action( 'woocommerce_product_after_variable_attributes', 'wp_zoom_variable_product_fields', 10, 3 );
 
+/**
+ * Save variation webinars
+ *
+ * @param integer $variation_id Variation ID to save onto.
+ * @return void
+ */
 function wp_zoom_save_variation( $variation_id ) {
 	// phpcs:ignore
 	$webinars = $_POST['_wp_zoom_webinars_variations'][ $variation_id ] ?? null;

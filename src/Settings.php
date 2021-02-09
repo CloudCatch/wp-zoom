@@ -29,6 +29,57 @@ class Settings extends \WC_Integration {
 		add_action( 'admin_init', array( $this, 'purge_cache' ) );
 
 		add_action( 'admin_init', array( $this, 'save_tokens' ), -10 );
+
+		add_action( 'wp_loaded', array( $this, 'get_access_token' ) );
+	}
+
+	public function get_access_token() {
+		global $wp_zoom;
+
+		if ( ! isset( $_REQUEST['wp-zoom-oauth'] ) ) {
+			return;
+		}
+
+		session_start();
+
+		delete_option( 'wp_zoom_oauth_tokens' );
+		delete_option( 'wp_zoom_user_id' );
+
+		Cache::delete_all();
+
+		if ( empty( $_GET['state'] ) || ( isset( $_SESSION['oauth2state'] ) && $_GET['state'] !== $_SESSION['oauth2state'] ) ) {
+
+			if ( isset( $_SESSION['oauth2state'] ) ) {
+				unset( $_SESSION['oauth2state'] );
+			}
+
+			exit( 'Invalid state' );
+
+		} else {
+
+			try {
+				$access_token = $wp_zoom->provider->getAccessToken(
+					'authorization_code',
+					array(
+						// phpcs:ignore
+						'code' => $_GET['code'],
+					)
+				);
+
+				$wp_zoom->update_access_token( $access_token );
+
+				$me = $wp_zoom->get_me();
+
+				if ( ! empty( $me['id'] ) ) {
+					update_option( 'wp_zoom_user_id', $me['id'] );
+				}
+
+				wp_safe_redirect( admin_url( 'admin.php?page=wc-settings&tab=integration&section=wp_zoom' ) );
+				exit;
+			} catch ( \Exception $e ) {
+				wp_die( esc_html( $e->getMessage() ) );
+			}
+		}
 	}
 
 	public function enqueue_scripts() {

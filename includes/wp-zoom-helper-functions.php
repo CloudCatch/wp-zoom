@@ -12,9 +12,9 @@
  * @param string $timezone Timezone.
  * @return string
  */
-function wp_zoom_format_date_time( string $datetime, string $timezone = 'GMT' ) {
+function wp_zoom_format_date_time( string $datetime, string $timezone = '' ) {
 	$gmt_timezone   = new DateTimeZone( 'GMT' );
-	$local_timezone = new DateTimeZone( $timezone );
+	$local_timezone = new DateTimeZone( $timezone === '' ? wp_timezone_string() : $timezone );
 
 	$gmt_datetime = new DateTime( trim( $datetime, 'Z' ), $gmt_timezone );
 	$offset       = $local_timezone->getOffset( $gmt_datetime );
@@ -26,56 +26,54 @@ function wp_zoom_format_date_time( string $datetime, string $timezone = 'GMT' ) 
 }
 
 /**
- * Get webinars for a given product
+ * Get webinars for a given post
  *
- * @param integer|WC_Product|WP_Post $product Product to check.
+ * @param integer|WP_Post $post Post to check.
  * @return array
  */
-function wp_zoom_product_get_webinars( $product = null ) {
+function wp_zoom_get_webinars( $post = null ) {
 	global $wp_zoom;
 
-	if ( is_numeric( $product ) ) {
-		$product = wc_get_product( $product );
-	} elseif ( ! $product ) {
-		$product = wc_get_product( get_the_ID() );
-	} elseif ( is_a( $product, 'WP_Post' ) && get_post_type( $product ) === 'product' ) {
-		$product = wc_get_product( $product->ID );
+	if ( is_numeric( $post ) ) {
+		$post = get_post( $post );
+	} elseif ( ! $post ) {
+		$post = get_post( get_the_ID() );
+	} elseif ( is_a( $post, 'WC_Product' ) ) {
+		$post = get_post( $post->get_id() );
 	}
 
-	if ( is_a( $product, 'WC_Product' ) ) {
-		if ( ! $product->is_type( 'variable' ) ) {
-			$webinars = $product->get_meta( '_wp_zoom_webinars' );
+	if ( is_a( $post, 'WP_Post' ) ) {
+		$webinars = get_post_meta( $post->ID, '_wp_zoom_webinars', true );
 
-			if ( ! is_array( $webinars ) ) {
-				$webinars = (array) $webinars;
-			}
-
-			if ( ! empty( $webinars ) ) {
-				array_walk(
-					$webinars,
-					function( &$webinar ) use ( $wp_zoom ) {
-						$_webinar = $wp_zoom->get_webinar( $webinar );
-
-						$webinar = isset( $_webinar['uuid'] ) ? $_webinar : null;
-					}
-				);
-			}
-
-			return $webinars ? array_filter( $webinars ) : array();
+		if ( ! is_array( $webinars ) ) {
+			$webinars = (array) $webinars;
 		}
+
+		if ( ! empty( $webinars ) ) {
+			array_walk(
+				$webinars,
+				function( &$webinar ) use ( $wp_zoom ) {
+					$_webinar = $wp_zoom->get_webinar( $webinar );
+
+					$webinar = isset( $_webinar['uuid'] ) ? $_webinar : null;
+				}
+			);
+		}
+
+		return $webinars ? array_filter( $webinars ) : array();
 	}
 
 	return array();
 }
 
 /**
- * Does a given product contain webinars?
+ * Does a given post contain webinars?
  *
- * @param integer|WC_Product|WP_Post $product Product to check.
+ * @param integer|WP_Post $post Post to check.
  * @return boolean
  */
-function wp_zoom_product_has_webinars( $product = null ) {
-	return wp_zoom_product_get_webinars( $product ) ? true : false;
+function wp_zoom_has_webinars( $post = null ) {
+	return wp_zoom_get_webinars( $post ) ? true : false;
 }
 
 /**

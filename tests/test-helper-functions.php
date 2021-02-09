@@ -22,7 +22,7 @@ class TestHelperFunctions extends WP_UnitTestCase {
         $this->assertEquals( wp_zoom_format_date_time( '2019-09-13T15:35:00Z', 'EST' ), '2019-09-13' );
     }
 
-    function test_wp_zoom_product_get_webinars() {
+    function test_wp_zoom_get_webinars() {
         $provider = $this->getMockBuilder('\League\OAuth2\Client\Provider\GenericProvider')
 			->setConstructorArgs(array( array(
 				'urlAuthorize' => 'https://example.com',
@@ -36,7 +36,7 @@ class TestHelperFunctions extends WP_UnitTestCase {
 			->setConstructorArgs(array($provider))
             ->getMock();
             
-        $GLOBALS['wp_zoom']->expects($this->exactly(2))
+        $GLOBALS['wp_zoom']->expects($this->exactly(4))
 			->method('get_webinar')
             ->will($this->returnValue(json_decode( '{"uuid": "123"}', true ) ) );
             
@@ -51,12 +51,12 @@ class TestHelperFunctions extends WP_UnitTestCase {
         
         $post_product = get_post( $simple_product->get_id() );
 
-        $this->assertSame( wp_zoom_product_get_webinars( 123 ), array() );
-        $this->assertSame( wp_zoom_product_get_webinars(), array() );
-        $this->assertSame( wp_zoom_product_get_webinars( $post_id ), array() );
-        $this->assertSame( wp_zoom_product_get_webinars( $post ), array() );
-        $this->assertSame( wp_zoom_product_get_webinars( $simple_product ), array( array( 'uuid' => '123' ) ) );
-        $this->assertSame( wp_zoom_product_get_webinars( $post_product ), array( array( 'uuid' => '123' ) ) );
+        $this->assertSame( wp_zoom_get_webinars( 123 ), array() );
+        $this->assertSame( wp_zoom_get_webinars(), array() );
+        $this->assertSame( wp_zoom_get_webinars( $post_id ), array( array( 'uuid' => '123' ) ) );
+        $this->assertSame( wp_zoom_get_webinars( $post ), array( array( 'uuid' => '123' ) ) );
+        $this->assertSame( wp_zoom_get_webinars( $simple_product ), array( array( 'uuid' => '123' ) ) );
+        $this->assertSame( wp_zoom_get_webinars( $post_product ), array( array( 'uuid' => '123' ) ) );
     }
 
 }
