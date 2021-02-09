@@ -113,3 +113,25 @@ function wp_zoom_get_available_webinar_occurrence( array $webinar, string $occur
 function wp_zoom_occurrence_available( array $webinar, string $occurrence_id ) {
 	return (bool) wp_zoom_get_available_webinar_occurrence( $webinar, $occurrence_id );
 }
+
+/**
+ * Sanitize recursively
+ *
+ * @param array|string $data Data to sanitize.
+ * @return array
+ */
+function wp_zoom_sanitize_recursive( $data ) {
+	if ( ! is_array( $data ) ) {
+		return sanitize_text_field( $data );
+	}
+
+	foreach ( $data as &$data ) {
+		if ( is_array( $data ) ) {
+			$data = array_map( 'sanitize_text_field', $data );
+		} else {
+			$data = sanitize_text_field( $data );
+		}
+	}
+
+	return $data;
+}

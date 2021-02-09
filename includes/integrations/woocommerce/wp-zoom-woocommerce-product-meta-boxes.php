@@ -64,10 +64,10 @@ add_action( 'woocommerce_product_data_panels', 'wp_zoom_product_data_tab_content
  */
 function wp_zoom_product_data_save( $id, $post ) {
 	// phpcs:ignore
-	$webinars = $_POST['_wp_zoom_webinars'] ?? null;
+	$webinars = array_map( 'intval', $_POST['_wp_zoom_webinars'] ?? array() );
 
 	if ( null !== $webinars ) {
-		update_post_meta( $id, '_wp_zoom_webinars', array_filter( $webinars ) );
+		update_post_meta( $id, '_wp_zoom_webinars', array_filter( (array) $webinars ) );
 	}
 }
 add_action( 'woocommerce_process_product_meta', 'wp_zoom_product_data_save', 10, 2 );
@@ -112,7 +112,7 @@ add_action( 'woocommerce_product_after_variable_attributes', 'wp_zoom_variable_p
  */
 function wp_zoom_save_variation( $variation_id ) {
 	// phpcs:ignore
-	$webinars = $_POST['_wp_zoom_webinars_variations'][ $variation_id ] ?? null;
+	$webinars = array_map( 'intval', $_POST['_wp_zoom_webinars_variations'][ $variation_id ] ?? array() );
 
 	if ( null !== $webinars ) {
 		update_post_meta( $variation_id, '_wp_zoom_webinars', array_filter( (array) $webinars ) );

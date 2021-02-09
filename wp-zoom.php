@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:     Zoom for WordPress
+ * Plugin Name:     Sell Zoom Webinars
  * Description:     Sell virtual Zoom webinars with WordPress
  * Version:         1.0.0
  * Author:          Seattle Web Co.

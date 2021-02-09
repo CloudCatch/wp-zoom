@@ -1,4 +1,4 @@
-=== Zoom for WordPress ===
+=== Sell Zoom Webinars ===
 Contributors: dkjensen, seattlewebco
 Tags: zoom,webinars,meetings,woocommerce
 Requires at least: 5.4

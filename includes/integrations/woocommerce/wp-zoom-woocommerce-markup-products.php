@@ -105,7 +105,7 @@ function wp_zoom_add_cart_item_data( $cart_item_data, $product_id, $variation_id
 
 	foreach ( $webinars as $webinar ) {
 		// phpcs:ignore
-		$occurrence_id = $_POST['_wp_zoom_webinars_occurrences'][ $webinar['id'] ] ?? '';
+		$occurrence_id = intval( $_POST['_wp_zoom_webinars_occurrences'][ $webinar['id'] ] ?? '' );
 
 		$cart_item_data['wp_zoom_webinars_occurrences'][ $webinar['id'] ] = wp_zoom_get_available_webinar_occurrence( $webinar, (string) $occurrence_id );
 	}
@@ -133,7 +133,7 @@ function wp_zoom_add_to_cart_validation( $passed, $product_id, $quantity, $varia
 			}
 
             // phpcs:ignore
-			$occurrence_id = (string) $_POST['_wp_zoom_webinars_occurrences'][ $webinar['id'] ] ?? '';
+			$occurrence_id = (string) intval( $_POST['_wp_zoom_webinars_occurrences'][ $webinar['id'] ] ?? '' );
 
 			if ( empty( $occurrence_id ) ) {
 				wc_add_notice( esc_html__( 'Please select a date and time for each webinar.', 'wp-zoom' ), 'error' );
@@ -456,9 +456,12 @@ add_filter( 'woocommerce_checkout_fields', 'wp_zoom_woocommerce_checkout_fields'
  */
 function wp_zoom_woocommerce_checkout_update_order_meta( $order_id ) {
 	// phpcs:ignore
-	if ( ! empty( $_POST['wp_zoom_webinars_custom_questions'] ) ) {
+	$custom_questions = array_map( 'wp_zoom_sanitize_recursive', $_POST['wp_zoom_webinars_custom_questions'] ?? array() );
+
+	// phpcs:ignore
+	if ( ! empty( $custom_questions ) ) {
 		// phpcs:ignore
-		update_post_meta( $order_id, '_wp_zoom_webinars_custom_questions', $_POST['wp_zoom_webinars_custom_questions'] );
+		update_post_meta( $order_id, '_wp_zoom_webinars_custom_questions', $custom_questions );
 	}
 }
 add_action( 'woocommerce_checkout_update_order_meta', 'wp_zoom_woocommerce_checkout_update_order_meta' );
@@ -478,7 +481,7 @@ function wp_zoom_woocommerce_checkout_posted_data( $data ) {
 				// phpcs:ignore
 				if ( isset( $_POST['wp_zoom_webinars_custom_questions'][ $matches[1] ] ) ) {
 					// phpcs:ignore
-					$data[ $key ] = $_POST['wp_zoom_webinars_custom_questions'][ $matches[1] ];
+					$data[ $key ] = wp_zoom_sanitize_recursive( $_POST['wp_zoom_webinars_custom_questions'][ $matches[1] ] );
 				}
 			}
 		}
@@ -549,7 +552,7 @@ function wp_zoom_ajax_woocommerce_get_variation_webinars() {
 	global $wp_zoom;
 
 	// phpcs:ignore
-	$webinar = $wp_zoom->get_webinar( $_REQUEST['webinar'] );
+	$webinar = $wp_zoom->get_webinar( (string) intval( $_REQUEST['webinar'] ) );
 
 	ob_start();
 	?>

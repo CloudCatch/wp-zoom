@@ -1,10 +1,10 @@
 # Copyright (C) 2021 Seattle Web Co.
-# This file is distributed under the same license as the Zoom for WordPress package.
+# This file is distributed under the same license as the Sell Zoom Webinars package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Zoom for WordPress 1.0.0\n"
+"Project-Id-Version: Sell Zoom Webinars 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wc-zoom\n"
-"POT-Creation-Date: 2021-02-09 15:01:23+00:00\n"
+"POT-Creation-Date: 2021-02-09 18:12:39+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,56 +13,56 @@ msgstr ""
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "X-Generator: node-wp-i18n 1.2.4\n"
 
-#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:124
+#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:139
 msgid "Please select a date and time for each webinar."
 msgstr ""
 
-#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:130
+#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:145
 msgid "Selected date and time is not available."
 msgstr ""
 
-#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:169
-#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:244
+#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:184
+#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:259
 msgid "Webinar has no fixed time."
 msgstr ""
 
-#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:200
+#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:215
 msgid ""
 "A product in your cart contains a webinar which has been modified or no "
 "longer exists, therefore the product was removed from your cart."
 msgstr ""
 
-#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:323
+#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:338
 #. translators: 1: Webinar topic 2: Webinar date and time
 msgid "User successfully registered for %1$s (%2$s)"
 msgstr ""
 
-#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:333
+#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:348
 #. translators: 1: Webinar topic
 msgid "An error occurred while registering customer for %1$s"
 msgstr ""
 
-#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:352
+#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:367
 msgid "Zoom Webinar ID"
 msgstr ""
 
-#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:355
+#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:370
 msgid "Zoom Webinar Occurrence ID"
 msgstr ""
 
-#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:358
+#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:373
 msgid "Zoom Webinar Topic"
 msgstr ""
 
-#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:361
+#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:376
 msgid "Zoom Webinar Date & Time"
 msgstr ""
 
-#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:492
+#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:510
 msgid "required"
 msgstr ""
 
-#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:494
+#: includes/integrations/woocommerce/wp-zoom-woocommerce-markup-products.php:512
 msgid "optional"
 msgstr ""
 
@@ -168,7 +168,7 @@ msgid "Plugin activation error"
 msgstr ""
 
 #. Plugin Name of the plugin/theme
-msgid "Zoom for WordPress"
+msgid "Sell Zoom Webinars"
 msgstr ""
 
 #. Description of the plugin/theme
