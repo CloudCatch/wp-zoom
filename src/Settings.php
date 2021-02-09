@@ -62,7 +62,7 @@ class Settings extends \WC_Integration {
 					'authorization_code',
 					array(
 						// phpcs:ignore
-						'code' => $_GET['code'],
+						'code' => sanitize_text_field( $_GET['code'] ),
 					)
 				);
 
@@ -161,7 +161,7 @@ class Settings extends \WC_Integration {
 		global $wp_zoom;
 
 		// phpcs:ignore
-		$tokens = $_GET['wp_zoom_tokens'] ?? null;
+		$tokens = wp_zoom_sanitize_recursive( $_GET['wp_zoom_tokens'] ?? '' );
 
 		if ( $tokens ) {
 			$tokens = json_decode( json_decode( stripslashes( $tokens ) ), true );
