@@ -17,7 +17,7 @@ function wp_zoom_api_disconnected( $e ) {
 
 	<?php esc_html_e( 'This is a notification to inform you that the WordPress for Zoom connection to the Zoom API has been disconnected.', 'wp-zoom' ); ?>
 	<?php /* translators: URL to reconnect to Zoom API */ ?>
-	<?php printf( esc_html__( 'Please visit %s to reconnect to the Zoom API.', 'wp-zoom' ), esc_url( admin_url( 'admin.php?page=wc-settings&tab=integration&section=wp_zoom' ) ) ); ?>
+	<?php printf( esc_html__( 'Please visit %s to reconnect to the Zoom API.', 'wp-zoom' ), esc_url( admin_url( 'options-general.php?page=wp-zoom' ) ) ); ?>
 
 	<?php
 	$body = ob_get_clean();

@@ -5,6 +5,8 @@
  * @package SeattleWebCo\WPZoom
  */
 
+use SeattleWebCo\WPZoom\Cache;
+
 /**
  * Format date / time string
  *
@@ -23,6 +25,62 @@ function wp_zoom_format_date_time( string $datetime, string $timezone = '' ) {
 	$local_datetime = new DateTime( $gmt_datetime->format( 'Y-m-d H:i:s' ), $local_timezone );
 
 	return $local_datetime->format( apply_filters( 'wp_zoom_datetime_format', 'l, F jS, Y \a\t g:ia T' ) );
+}
+
+/**
+ * Return an unformatted end date / time string
+ *
+ * @param string  $datetime
+ * @param integer $duration
+ * @return string
+ */
+function wp_zoom_format_get_end_date_time( string $datetime, int $duration ) {
+	$gmt_timezone = new DateTimeZone( 'GMT' );
+
+	$gmt_datetime = new DateTime( trim( $datetime, 'Z' ), $gmt_timezone );
+	$gmt_datetime->add( DateInterval::createFromDateString( (string) $duration . 'minutes' ) );
+
+	return $gmt_datetime->format( 'Y-m-d\TH:i:sZ' );
+}
+
+/**
+ * Get all purchase products for a given webinar
+ *
+ * @param string $webinar_id The webinar ID to check.
+ * @return null|array
+ */
+function wp_zoom_get_purchase_products( string $webinar_id ) {
+	global $wpdb;
+
+	$cache = Cache::get( 'wp_zoom_webinar_purchase_products_' . $webinar_id );
+
+	if ( false !== $cache ) {
+		return $cache;
+	}
+
+	$webinar_id = (string) intval( $webinar_id );
+
+	// phpcs:ignore
+	$products = $wpdb->get_col(
+		"
+		SELECT pm.post_id
+		FROM   {$wpdb->postmeta} pm
+			INNER JOIN {$wpdb->postmeta} pm2
+					ON pm2.meta_key = '_wp_zoom_webinars'
+					AND pm2.meta_value LIKE '%{$webinar_id}%'
+					AND pm2.post_id = pm.post_id
+		WHERE  pm.meta_key = '_wp_zoom_purchase_url'
+			AND pm.meta_value = 'yes' 
+	"
+	);
+
+	if ( empty( $products ) ) {
+		return null;
+	}
+
+	Cache::set( 'wp_zoom_webinar_purchase_products_' . $webinar_id, $products );
+
+	return $products;
 }
 
 /**
@@ -74,6 +132,24 @@ function wp_zoom_get_webinars( $post = null ) {
  */
 function wp_zoom_has_webinars( $post = null ) {
 	return wp_zoom_get_webinars( $post ) ? true : false;
+}
+
+/**
+ * Does a given post contain a Type 9 webinar?
+ *
+ * @param integer|WP_Post $post Post to check.
+ * @return boolean
+ */
+function wp_zoom_has_type_9_webinar( $post = null ) {
+	$webinars = wp_zoom_get_webinars( $post );
+
+	foreach ( $webinars as $webinar ) {
+		if ( $webinar['type'] ?? '' === 9 ) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**

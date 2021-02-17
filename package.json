@@ -12,7 +12,14 @@
     "url": "https://github.com/seattlewebco/wp-zoom/issues"
   },
   "homepage": "https://github.com/seattlewebco/wp-zoom#readme",
-  "dependencies": {},
+  "dependencies": {
+    "@fullcalendar/adaptive": "^5.5.0",
+    "@fullcalendar/core": "^5.5.1",
+    "@fullcalendar/daygrid": "^5.5.0",
+    "@fullcalendar/interaction": "^5.5.0",
+    "@fullcalendar/list": "^5.5.0",
+    "@fullcalendar/timegrid": "^5.5.1"
+  },
   "devDependencies": {
     "@babel/plugin-transform-classes": "^7.9.5",
     "@babel/polyfill": "^7.8.7",
@@ -34,6 +41,7 @@
     "laravel-mix-svg-sprite": "^1.0.2",
     "node-wp-i18n": "^1.2.2",
     "postcss": "^8.2.4",
+    "postcss-loader": "^5.0.0",
     "postcss-preset-env": "^6.5.0",
     "prettier": "^1.13.4",
     "prettier-stylelint": "^0.4.2",

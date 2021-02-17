@@ -79,7 +79,7 @@ function wp_zoom_prepare_webinar_data( $post, $wp_query ) {
 				$GLOBALS['webinars'] = array_merge( $GLOBALS['webinars'], wp_zoom_get_webinars( $child ) );
 			}
 
-			$GLOBALS['webinars'] = array_unique( $GLOBALS['webinars'] );
+			$GLOBALS['webinars'] = array_unique( $GLOBALS['webinars'], SORT_REGULAR );
 		}
 	}
 }
@@ -582,3 +582,51 @@ function wp_zoom_ajax_woocommerce_get_variation_webinars() {
 }
 add_action( 'wp_ajax_wp_zoom_woocommerce_get_variation_webinars', 'wp_zoom_ajax_woocommerce_get_variation_webinars' );
 add_action( 'wp_ajax_nopriv_wp_zoom_woocommerce_get_variation_webinars', 'wp_zoom_ajax_woocommerce_get_variation_webinars' );
+
+/**
+ * Remove AJAX add to cart capability for products containing Type 9 webinars
+ *
+ * @param array      $args Add to cart button args.
+ * @param WC_Product $product The current product.
+ * @return array
+ */
+function wp_zoom_woocommerce_loop_add_to_cart_args( $args, $product ) {
+	if ( wp_zoom_has_type_9_webinar( $product->get_id() ) ) {
+		$args['class'] = str_replace( ' ajax_add_to_cart', '', $args['class'] );
+	}
+
+	return $args;
+}
+add_filter( 'woocommerce_loop_add_to_cart_args', 'wp_zoom_woocommerce_loop_add_to_cart_args', 10, 2 );
+
+/**
+ * Change add to cart button text for products containing Type 9 webinars
+ *
+ * @param string     $text Add to cart text.
+ * @param WC_Product $product The current product.
+ * @return sring
+ */
+function wp_zoom_woocommerce_product_add_to_cart_text( $text, $product ) {
+	if ( wp_zoom_has_type_9_webinar( $product->get_id() ) ) {
+		$text = esc_html__( 'Select Date & Time', 'wp-zoom' );
+	}
+
+	return $text;
+}
+add_filter( 'woocommerce_product_add_to_cart_text', 'wp_zoom_woocommerce_product_add_to_cart_text', 10, 2 );
+
+/**
+ * Change add to cart URL for products containing Type 9 webinars
+ *
+ * @param string     $url Add to cart url.
+ * @param WC_Product $product The current product.
+ * @return sring
+ */
+function wp_zoom_woocommerce_product_add_to_cart_url( $url, $product ) {
+	if ( wp_zoom_has_type_9_webinar( $product->get_id() ) ) {
+		$url = $product->get_permalink();
+	}
+
+	return $url;
+}
+add_filter( 'woocommerce_product_add_to_cart_url', 'wp_zoom_woocommerce_product_add_to_cart_url', 10, 2 );

@@ -21,19 +21,20 @@ define( 'WP_ZOOM_VER', function_exists( 'get_plugin_data' ) ? get_plugin_data( _
 define( 'WP_ZOOM_DB_VER', '1.0.0' );
 define( 'WP_ZOOM_BASE', __FILE__ );
 
-require_once 'vendor/autoload.php';
+require_once WP_ZOOM_DIR . 'vendor/autoload.php';
 
-require_once 'includes/wp-zoom-enqueue-scripts.php';
-require_once 'includes/wp-zoom-api-functions.php';
-require_once 'includes/wp-zoom-markup-functions.php';
-require_once 'includes/wp-zoom-helper-functions.php';
-
-require_once 'includes/integrations/wp-zoom-load-integrations.php';
+require_once WP_ZOOM_DIR . 'includes/wp-zoom-enqueue-scripts.php';
+require_once WP_ZOOM_DIR . 'includes/wp-zoom-api-functions.php';
+require_once WP_ZOOM_DIR . 'includes/wp-zoom-markup-functions.php';
+require_once WP_ZOOM_DIR . 'includes/wp-zoom-helper-functions.php';
+require_once WP_ZOOM_DIR . 'includes/integrations/wp-zoom-integrations.php';
+require_once WP_ZOOM_DIR . 'includes/wp-zoom-ajax.php';
+require_once WP_ZOOM_DIR . 'includes/wp-zoom-settings.php';
 
 if ( defined( 'WP_ZOOM_CLIENT_ID' ) && defined( 'WP_ZOOM_CLIENT_SECRET' ) ) {
 	$wp_zoom_provider = new \SeattleWebCo\WPZoom\Provider\Zoom(
 		array(
-			'redirectUri'   => admin_url( 'admin.php?page=wc-settings&tab=integration&section=wp_zoom&wp-zoom-oauth' ),
+			'redirectUri'   => admin_url( 'options-general.php?page=wp-zoom' ),
 			'timeout'       => 30,
 			'clientId'      => constant( 'WP_ZOOM_CLIENT_ID' ),
 			'clientSecret'  => constant( 'WP_ZOOM_CLIENT_SECRET' ),
@@ -42,7 +43,7 @@ if ( defined( 'WP_ZOOM_CLIENT_ID' ) && defined( 'WP_ZOOM_CLIENT_SECRET' ) ) {
 } else {
 	$wp_zoom_provider = new \SeattleWebCo\WPZoom\Provider\ZoomForWp(
 		array(
-			'redirectUri' => admin_url( 'admin.php?page=wc-settings&tab=integration&section=wp_zoom' ),
+			'redirectUri' => admin_url( 'options-general.php?page=wp-zoom' ),
 			'timeout'     => 30,
 		)
 	);

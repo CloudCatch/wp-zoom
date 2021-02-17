@@ -11,6 +11,8 @@
 // Import required packages.
 const mix = require("laravel-mix");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const path = require('path');
 
 require("laravel-mix-polyfill");
 require("laravel-mix-svg-sprite");
@@ -56,13 +58,6 @@ mix.options({
 });
 
 /*
- * Builds sources maps for assets.
- *
- * @link https://laravel.com/docs/5.6/mix#css-source-maps
- */
-mix.sourceMaps();
-
-/*
  * Versioning and cache busting. Append a unique hash for production assets. If
  * you only want versioned assets in production, do a conditional check for
  * `mix.inProduction()`.
@@ -77,8 +72,9 @@ mix.version();
  * @link https://laravel.com/docs/5.6/mix#working-with-scripts
  */
 mix
-  .js(`${devPath}/js/admin.js`, `${distPath}/js/admin.js`)
-  .js(`${devPath}/js/frontend.js`, `${distPath}/js/frontend.js`);
+  .js(`${devPath}/js/admin.js`, `${distPath}/js`)
+  .js(`${devPath}/js/frontend.js`, `${distPath}/js`)
+  .js(`${devPath}/js/calendar.js`, `${distPath}/js`);
 
 /*
  * Compile CSS. Mix supports Sass, Less, Stylus, and plain CSS, and has functions
@@ -98,7 +94,7 @@ var sassConfig = {
 
 // Compile SASS/CSS.
 mix
-  .sass(`${devPath}/scss/admin.scss`, `${distPath}/css/admin.css`, sassConfig)
+  .sass(`${devPath}/scss/admin.scss`, `${distPath}/css`, sassConfig)
   .options({
     postCss: [
       require("cssnano")({
@@ -115,7 +111,7 @@ mix
   })
   .sass(
     `${devPath}/scss/frontend.scss`,
-    `${distPath}/css/frontend.css`,
+    `${distPath}/css`,
     sassConfig
   )
   .options({
@@ -151,8 +147,8 @@ mix.webpackConfig({
     // @link https://github.com/webpack-contrib/copy-webpack-plugin
     new CopyWebpackPlugin([
       { from: `${devPath}/fonts`, to: `${distPath}/fonts` },
-    ]),
-  ],
+    ])
+  ]
 });
 
 if (process.env.sync) {

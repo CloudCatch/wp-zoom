@@ -25,10 +25,10 @@ This plugin integrates with the Zoom API located at https://api.zoom.us/v2
 
 1. Visit [Zoom Marketplace](https://marketplace.zoom.us/develop/create) to create a new App
 2. Click create under OAuth apps
-3. Account-level app 
+3. User-level app 
 4. Do not select publish app on Zoom App Marketplace
 5. In App Credentials, set the Redirect URL for OAuth to use your WordPress site URL with the following path appended to the end: 
- **/wp-admin/admin.php?page=wc-settings&tab=integration&section=wp_zoom&wp-zoom-oauth**
+ **/wp-admin/options-general.php?page=wp-zoom**
 6. Add the same URL to the list of whitelisted URLs
 7. Use the following scopes: **user_profile**, **webinar:read**, **webinar:write**
 8. Define `WP_ZOOM_CLIENT_ID` and `WP_ZOOM_CLIENT_SECRET` in your **wp-config.php**, use the values given when creating the app from the steps above

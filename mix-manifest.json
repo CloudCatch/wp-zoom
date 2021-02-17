@@ -1,6 +1,7 @@
 {
-    "/assets/js/admin.js": "/assets/js/admin.js?id=530fad83e216f2fd56a8",
-    "/assets/js/frontend.js": "/assets/js/frontend.js?id=133f1665a7b28db01def",
-    "/assets/css/frontend.css": "/assets/css/frontend.css?id=271cfbb1779d3152aa95",
-    "/assets/css/admin.css": "/assets/css/admin.css?id=36dcff4132c00aaa3d68"
+    "/assets/js/admin.js": "/assets/js/admin.js?id=3a119bcb82758ce9707a",
+    "/assets/js/frontend.js": "/assets/js/frontend.js?id=e8e3dd8d60dc0a381415",
+    "/assets/js/calendar.js": "/assets/js/calendar.js?id=18b02ba2d25b5eaf469e",
+    "/assets/css/frontend.css": "/assets/css/frontend.css?id=5bf2269e758c8fd2b6a3",
+    "/assets/css/admin.css": "/assets/css/admin.css?id=a737f7a142a07680d76d"
 }

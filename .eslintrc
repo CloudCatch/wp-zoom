@@ -16,8 +16,8 @@
       "document": true
 	  },
     "rules": {
-      "object-curly-spacing": "warn",
+      "object-curly-spacing": "always",
       "array-bracket-spacing": 1,
-      "space-in-parens": 1
+      "space-in-parens": ["error", "always"]
     }
 }

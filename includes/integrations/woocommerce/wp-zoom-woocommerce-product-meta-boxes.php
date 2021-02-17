@@ -31,22 +31,31 @@ add_filter( 'woocommerce_product_data_tabs', 'wp_zoom_product_data_tab' );
 function wp_zoom_product_data_tab_content() {
 	global $post;
 
-	$selected = (array) get_post_meta( $post->ID, '_wp_zoom_webinars', true );
+	$webinars     = (array) get_post_meta( $post->ID, '_wp_zoom_webinars', true );
+	$purchase_url = get_post_meta( $post->ID, '_wp_zoom_purchase_url', true );
 	?>
 
 	<div id="wp_zoom_product_data" class="panel woocommerce_options_panel">
 		<div class="options_group">
-			<p class="form-field _purchase_note_field ">
+			<p class="form-field _wp_zoom_webinars_field">
 				<label for="_wp_zoom_webinars"><?php esc_html_e( 'Webinars', 'wp-zoom' ); ?></label>
 				<?php
 				wp_zoom_render_field_select_webinars(
 					array(
-						'selected'      => $selected,
+						'selected'      => $webinars,
 						'multiple'      => true,
 						'placeholder'   => esc_attr__( 'Select', 'wp-zoom' ),
 					)
 				);
 				?>
+			</p>
+			<p class="form-field _wp_zoom_purchase_url">
+				<label for="_wp_zoom_purchase_url">
+					<?php esc_html_e( 'Set as purchase URL', 'wp-zoom' ); ?>
+				</label>
+				<input type="checkbox" <?php checked( $purchase_url, 'yes' ); ?> class="checkbox" name="_wp_zoom_purchase_url" id="_wp_zoom_purchase_url" value="yes" /> 
+				<span class="description"><?php esc_html_e( 'Enable this to set as purchase URL for the webinars specified above.', 'wp-zoom' ); ?></span>
+				<span class="wp-zoom-purchase-url-notice"></span>
 			</p>
 		</div>
 	</div>
@@ -65,9 +74,12 @@ add_action( 'woocommerce_product_data_panels', 'wp_zoom_product_data_tab_content
 function wp_zoom_product_data_save( $id, $post ) {
 	// phpcs:ignore
 	$webinars = array_map( 'intval', $_POST['_wp_zoom_webinars'] ?? array() );
+	// phpcs:ignore
+	$purchase_url = sanitize_text_field( $_POST['_wp_zoom_purchase_url'] ?? '' );
 
 	if ( null !== $webinars ) {
 		update_post_meta( $id, '_wp_zoom_webinars', array_filter( (array) $webinars ) );
+		update_post_meta( $id, '_wp_zoom_purchase_url', $purchase_url );
 	}
 }
 add_action( 'woocommerce_process_product_meta', 'wp_zoom_product_data_save', 10, 2 );
