@@ -34,6 +34,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: WordPress Plugin Deploy
+        if: steps.semantic.outputs.new-release-published == 'true'
         uses: 10up/action-wordpress-plugin-deploy@1.5.0
         with:
           generate-zip: true
@@ -43,6 +44,7 @@ jobs:
           SLUG: wp-zoom
           VERSION: ${{ steps.semantic.outputs.release-version }}
       - name: Upload release asset
+        if: steps.semantic.outputs.new-release-published == 'true'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
