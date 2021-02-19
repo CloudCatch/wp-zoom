@@ -2,6 +2,20 @@ module.exports = {
   tagFormat: "${version}",
   branch: "master",
   plugins: [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "changelog.txt"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["CHANGELOG.md"]
+      }
+    ]
     ["@semantic-release/npm", { npmPublish: false }],
     "@semantic-release/github",
     [
