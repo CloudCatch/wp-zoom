@@ -101,6 +101,7 @@ class Zoom extends AbstractProvider {
 	 * @throws InvalidTokenException Invalid access token.
 	 */
 	protected function checkResponse( ResponseInterface $response, $data ) {
+		// phpcs:ignore
 		if ( substr( $response->getStatusCode(), 0, 1 ) != 2 ) {
 			if ( isset( $data['code'] ) && $data['code'] === 124 ) {
 				throw new InvalidTokenException(
@@ -125,6 +126,7 @@ class Zoom extends AbstractProvider {
 			$error = $data[ $this->response_error ];
 
 			if ( ! is_string( $error ) ) {
+				// phpcs:ignore
 				$error = var_export( $error, true );
 			}
 

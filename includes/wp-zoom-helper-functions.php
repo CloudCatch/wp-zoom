@@ -30,8 +30,8 @@ function wp_zoom_format_date_time( string $datetime, string $timezone = '' ) {
 /**
  * Return an unformatted end date / time string
  *
- * @param string  $datetime
- * @param integer $duration
+ * @param string  $datetime Date / time to get end.
+ * @param integer $duration Duration in minutes.
  * @return string
  */
 function wp_zoom_format_get_end_date_time( string $datetime, int $duration ) {

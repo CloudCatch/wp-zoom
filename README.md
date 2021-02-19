@@ -1,3 +1,3 @@
 # Zoom for WordPress
 
-Sell virtual Zoom webinars with WordPress + WordPress
+Simple Zoom integration with WordPress makes anything possible + WordPress

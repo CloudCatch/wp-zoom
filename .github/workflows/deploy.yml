@@ -25,6 +25,7 @@ jobs:
         run: |
           npm install
           npm run build
+          npm run i18n
 
       - name: Semantic release
         id: semantic

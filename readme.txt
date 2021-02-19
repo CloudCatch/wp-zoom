@@ -1,10 +1,10 @@
-=== Sell Zoom Webinars ===
+=== Zoom for WordPress ===
 Contributors: dkjensen, seattlewebco
 Tags: zoom,webinars,meetings,woocommerce
 Requires at least: 5.4
 Tested up to: 5.6.1
-Requires PHP: 7.2.0
-Stable tag: 1.0.0
+Requires PHP: 7.0.0
+Stable tag: 0.0.0-development
 License: GPL-3.0
 License URI: https://github.com/seattlewebco/wp-zoom/blob/master/LICENSE
 
@@ -20,7 +20,7 @@ This plugin integrates with the Zoom API located at https://api.zoom.us/v2
 
 = Minimum Requirements =
 
-* PHP 7.2 or greater is required
+* PHP 7.0 or greater is required
 * MySQL 5.6 or greater is recommended
 
 1. Visit [Zoom Marketplace](https://marketplace.zoom.us/develop/create) to create a new App

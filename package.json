@@ -1,7 +1,7 @@
 {
   "name": "wp-zoom",
   "version": "0.0.0-development",
-  "description": "Sell virtual Zoom webinars with WordPress",
+  "description": "Simple Zoom integration with WordPress makes anything possible",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/seattlewebco/wp-zoom.git"
@@ -12,6 +12,12 @@
     "url": "https://github.com/seattlewebco/wp-zoom/issues"
   },
   "homepage": "https://github.com/seattlewebco/wp-zoom#readme",
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "lint-staged"
+    }
+  },
   "dependencies": {
     "@fullcalendar/adaptive": "^5.5.0",
     "@fullcalendar/core": "^5.5.1",
@@ -21,8 +27,10 @@
     "@fullcalendar/timegrid": "^5.5.1"
   },
   "devDependencies": {
-    "@babel/plugin-transform-classes": "^7.9.5",
+    "@babel/plugin-transform-classes": "^7.12.13",
     "@babel/polyfill": "^7.8.7",
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
     "babel-eslint": "^10.1.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-preset-env": "^1.7.0",
@@ -36,26 +44,27 @@
     "eslint-config-wordpress": "^2.0.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^8.0.0",
+    "husky": "^5.0.9",
     "laravel-mix": "^6.0.11",
     "laravel-mix-polyfill": "^3.0.0",
     "laravel-mix-svg-sprite": "^1.0.2",
-    "node-wp-i18n": "^1.2.2",
-    "postcss": "^8.2.4",
+    "node-wp-i18n": "^1.2.5",
+    "postcss": "^8.2.6",
     "postcss-loader": "^5.0.0",
     "postcss-preset-env": "^6.5.0",
     "prettier": "^1.13.4",
     "prettier-stylelint": "^0.4.2",
     "resolve-url-loader": "^3.1.2",
-    "sass": "^1.16.0",
+    "sass": "^1.32.7",
     "sass-loader": "^7.1.0",
-    "semantic-release-version-bump": "^1.4.1",
+    "semantic-release-plugin-update-version-in-files": "^1.1.0",
     "stylelint": "^9.9.0",
     "stylelint-config-recommended-scss": "^3.2.0",
     "stylelint-config-wordpress": "^13.1.0",
     "stylelint-order": "^0.8.1",
     "vue": "^2.6.11",
     "vue-template-compiler": "^2.6.10",
-    "webpack": "^5.9.0"
+    "webpack": "^5.22.0"
   },
   "scripts": {
     "build": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --config=node_modules/laravel-mix/setup/webpack.config.js",
@@ -63,33 +72,10 @@
     "lint": "npm run lint:styles && npm run lint:scripts && npm run lint:php",
     "lint:styles": "cross-env stylelint './assets/scss/**/*.scss' --syntax scss",
     "lint:scripts": "cross-env eslint './assets/js/*.js'",
-    "lint:php": "cross-env ./vendor/bin/phpcs . --runtime-set testVersion 7.2- -s",
+    "lint:php": "cross-env ./vendor/bin/phpcs . --runtime-set testVersion 7.0- -s",
     "i18n": "npm run i18n:textdomain && npm run i18n:pot",
     "i18n:textdomain": "npx wpi18n addtextdomain --exclude=vendor,tests,node_modules",
     "i18n:pot": "npx wpi18n makepot --domain-path=languages",
     "package": "./bin/build-zip.sh"
-  },
-  "release": {
-    "tagFormat": "${version}",
-    "branches": [
-      "master"
-    ],
-    "plugins": [
-      "@semantic-release/github",
-      [
-        "@semantic-release/npm",
-        {
-          "npmPublish": false
-        }
-      ]
-    ],
-    "prepare": [
-      [
-        "semantic-release-version-bump",
-        {
-          "files": "wp-zoom.php"
-        }
-      ]
-    ]
   }
 }

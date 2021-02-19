@@ -1,14 +1,14 @@
 <?php
 /**
- * Plugin Name:     Sell Zoom Webinars
- * Description:     Sell virtual Zoom webinars with WordPress
- * Version:         1.0.0
+ * Plugin Name:     Zoom for WordPress
+ * Description:     Simple Zoom integration with WordPress makes anything possible
+ * Version:         0.0.0-development
  * Author:          Seattle Web Co.
  * Author URI:      https://seattlewebco.com
  * Text Domain:     wp-zoom
  * Domain Path:     /languages/
  * Contributors:    seattlewebco, dkjensen
- * Requires PHP:    7.2.0
+ * Requires PHP:    7.0.0
  *
  * @package SeattleWebCo\WPZoom
  */
@@ -55,10 +55,10 @@ $GLOBALS['wp_zoom'] = new Api( $wp_zoom_provider );
  * Activation hook
  */
 function wp_zoom_activation() {
-	if ( version_compare( PHP_VERSION, '7.2.0', '<' ) ) {
+	if ( version_compare( PHP_VERSION, '7.0.0', '<' ) ) {
 		deactivate_plugins( basename( __FILE__ ) );
 		wp_die(
-			esc_html__( 'This plugin requires a minimum PHP version of 7.2.0', 'wp-zoom' ),
+			esc_html__( 'This plugin requires a minimum PHP version of 7.0.0', 'wp-zoom' ),
 			esc_html__( 'Plugin activation error', 'wp-zoom' ),
 			array(
 				'response'  => 200,

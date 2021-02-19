@@ -49,9 +49,9 @@ class Cache {
 			return;
 		}
 
-		wp_cache_set( $key, json_encode( $value ), $group, $expires );
+		wp_cache_set( $key, wp_json_encode( $value ), $group, $expires );
 
-		set_transient( $key, json_encode( $value ), $expires );
+		set_transient( $key, wp_json_encode( $value ), $expires );
 	}
 
 	/**
