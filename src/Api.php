@@ -24,13 +24,6 @@ class Api {
 	public $base_uri = 'https://api.zoom.us/v2';
 
 	/**
-	 * Currently authenticated user ID
-	 *
-	 * @var integer
-	 */
-	public $user_id;
-
-	/**
 	 * OAuth 2 provider
 	 *
 	 * @var AbstractProvider
@@ -44,17 +37,16 @@ class Api {
 	 */
 	public function __construct( AbstractProvider $provider ) {
 		$this->provider = $provider;
-
-		$this->user_id = get_option( 'wp_zoom_user_id', null );
 	}
 
 	/**
 	 * Update access token in database
 	 *
 	 * @param AccessToken|Array $access_token Access token data to save to database.
+	 * @param integer           $user_id The WordPress user ID to update tokens for.
 	 * @return AccessToken
 	 */
-	public function update_access_token( $access_token ) {
+	public function update_access_token( $access_token, int $user_id ) {
 		if ( is_array( $access_token ) ) {
 			$access_token = wp_parse_args(
 				$access_token,
@@ -70,7 +62,8 @@ class Api {
 			return $access_token;
 		}
 
-		update_option(
+		update_user_meta(
+			$user_id,
 			'wp_zoom_oauth_tokens',
 			$access_token->jsonSerialize()
 		);
@@ -81,10 +74,11 @@ class Api {
 	/**
 	 * Returns a valid access token and refreshes the current one if needed
 	 *
+	 * @param integer $user_id The WordPress user ID to get tokens for.
 	 * @return AccessToken|string
 	 */
-	private function get_access_token() {
-		$tokens = get_option( 'wp_zoom_oauth_tokens', array() );
+	private function get_access_token( int $user_id ) {
+		$tokens = get_user_meta( $user_id, 'wp_zoom_oauth_tokens', true );
 
 		if ( empty( $tokens['access_token'] ) || empty( $tokens['refresh_token'] ) || empty( $tokens['expires'] ) ) {
 			return null;
@@ -93,7 +87,7 @@ class Api {
 		if ( $tokens['expires'] <= time() ) {
 			$access_token = $this->provider->getAccessToken( 'refresh_token', array( 'refresh_token' => $tokens['refresh_token'] ) );
 
-			return $this->update_access_token( $access_token );
+			return $this->update_access_token( $access_token, $user_id );
 		}
 
 		return new AccessToken( $tokens );
@@ -102,15 +96,16 @@ class Api {
 	/**
 	 * Perform a request against the Zoom API
 	 *
-	 * @param string $uri Request endpoint.
-	 * @param string $method Request method.
-	 * @param mixed  $body Request body.
-	 * @param array  $headers Request headers.
+	 * @param string  $uri Request endpoint.
+	 * @param string  $method Request method.
+	 * @param mixed   $body Request body.
+	 * @param array   $headers Request headers.
+	 * @param integer $user_id WordPress user ID.
 	 * @return mixed
 	 */
-	public function request( $uri, $method = 'GET', $body = null, $headers = array() ) {
+	public function request( $uri, $method = 'GET', $body = null, $headers = array(), $user_id = 0 ) {
 		try {
-			$access_token = $this->get_access_token();
+			$access_token = $this->get_access_token( $user_id ? $user_id : get_current_user_id() );
 
 			$request = $this->provider->getAuthenticatedRequest(
 				$method,
@@ -126,12 +121,12 @@ class Api {
 
 			return $response;
 		} catch ( InvalidTokenException $e ) {
-			delete_option( 'wp_zoom_oauth_tokens' );
-			delete_option( 'wp_zoom_user_id' );
+			delete_user_meta( $user_id, 'wp_zoom_oauth_tokens' );
+			delete_user_meta( $user_id, 'wp_zoom_user_id' );
 
 			Cache::delete_all();
 
-			do_action( 'wp_zoom_disconnected', $e );
+			do_action( 'wp_zoom_disconnected', $e, $user_id );
 		} catch ( \Exception $e ) {
 			Log::write( $e->getMessage() );
 		}
@@ -142,7 +137,7 @@ class Api {
 	/**
 	 * Get current authenticated user details
 	 *
-	 * @return string
+	 * @return array
 	 */
 	public function get_me() {
 		return $this->request( $this->base_uri . '/users/me', 'GET', null, array( 'Content-Type' => 'application/json;charset=UTF-8' ) );
@@ -178,12 +173,13 @@ class Api {
 	/**
 	 * Get all webinars
 	 *
+	 * @param string  $user_id Zoom user ID.
 	 * @param boolean $cached Retrieve cached results or not.
 	 * @return array
 	 */
-	public function get_webinars( bool $cached = true ) {
+	public function get_webinars( string $user_id, bool $cached = true ) {
 		if ( $cached ) {
-			$cache = Cache::get( 'wp_zoom_webinars' );
+			$cache = Cache::get( 'wp_zoom_webinars_' . $user_id );
 
 			if ( false !== $cache ) {
 				return $cache;
@@ -191,7 +187,7 @@ class Api {
 		}
 
 		$response = $this->request(
-			add_query_arg( array( 'page_size' => 300 ), $this->base_uri . '/users/' . $this->user_id . '/webinars' ),
+			add_query_arg( array( 'page_size' => 300 ), $this->base_uri . '/users/' . $user_id . '/webinars' ),
 			'GET',
 			null,
 			array( 'Content-Type' => 'application/json;charset=UTF-8' )
@@ -201,7 +197,7 @@ class Api {
 			return $response;
 		}
 
-		Cache::set( 'wp_zoom_webinars', $response, 'wp_zoom_webinars' );
+		Cache::set( 'wp_zoom_webinars_' . $user_id, $response, 'wp_zoom_webinars' );
 
 		return $response;
 	}

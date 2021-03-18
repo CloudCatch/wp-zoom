@@ -16,9 +16,8 @@ function wp_zoom_single_product_summary() {
 	global $webinars;
 
 	if ( ! empty( $webinars ) && is_array( $webinars ) ) {
-		?>
-
-		<?php foreach ( $webinars as $webinar ) { ?>
+		foreach ( $webinars as $webinar ) {
+			?>
 
 			<div class="wp-zoom-webinar-group">
 				<div class="wp-zoom-webinar-field">
@@ -30,7 +29,8 @@ function wp_zoom_single_product_summary() {
 						wp_zoom_render_field_webinar(
 							$webinar,
 							array(
-								'name' => esc_attr( '_wp_zoom_webinars_occurrences[' . $webinar['id'] . ']' ),
+								'name'     => esc_attr( '_wp_zoom_webinars_occurrences[' . $webinar['id'] . ']' ),
+								'selected' => array( intval( $_REQUEST['occurrence_id'] ?? 0 ) ),
 							)
 						);
 						?>
@@ -630,3 +630,10 @@ function wp_zoom_woocommerce_product_add_to_cart_url( $url, $product ) {
 	return $url;
 }
 add_filter( 'woocommerce_product_add_to_cart_url', 'wp_zoom_woocommerce_product_add_to_cart_url', 10, 2 );
+
+function wp_zoom_woocommerce_roles_allowed_admin() {
+	if ( current_user_can( 'wp_zoom_authorize' ) ) {
+		add_filter( 'woocommerce_prevent_admin_access', '__return_false' );
+	}
+}
+add_action( 'admin_init', 'wp_zoom_woocommerce_roles_allowed_admin', -10 );

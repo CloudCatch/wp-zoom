@@ -8,10 +8,11 @@
 /**
  * Notify administrator when the Zoom API is disconnected
  *
- * @param Exception $e Exception object.
+ * @param Exception    $e Exception object.
+ * @param integer|null $user_id The WordPress user ID.
  * @return void
  */
-function wp_zoom_api_disconnected( $e ) {
+function wp_zoom_api_disconnected( $e, $user_id ) {
 	ob_start();
 	?>
 
@@ -22,6 +23,10 @@ function wp_zoom_api_disconnected( $e ) {
 	<?php
 	$body = ob_get_clean();
 
-	wp_mail( get_bloginfo( 'admin_email' ), esc_html__( 'Zoom API Disconnected', 'wp-zoom' ), $body );
+	$user = get_userdata( $user_id );
+
+	if ( ! empty( $user->user_email ) ) {
+		wp_mail( $user->user_email, esc_html__( 'Zoom API Disconnected', 'wp-zoom' ), $body );
+	}
 }
-add_action( 'wp_zoom_disconnected', 'wp_zoom_api_disconnected' );
+add_action( 'wp_zoom_disconnected', 'wp_zoom_api_disconnected', 10, 2 );

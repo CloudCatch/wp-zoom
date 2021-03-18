@@ -2,7 +2,7 @@
 /**
  * Plugin Name:     Zoom for WordPress
  * Description:     Simple Zoom integration with WordPress makes anything possible
- * Version:         0.0.0-development
+ * Version:         1.2.0
  * Author:          Seattle Web Co.
  * Author URI:      https://seattlewebco.com
  * Text Domain:     wp-zoom
@@ -66,6 +66,8 @@ function wp_zoom_activation() {
 			)
 		);
 	}
+
+	Install::setup_roles();
 
 	delete_option( 'rewrite_rules' );
 

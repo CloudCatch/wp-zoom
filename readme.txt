@@ -4,7 +4,7 @@ Tags: zoom,webinars,meetings,woocommerce
 Requires at least: 5.4
 Tested up to: 5.6.1
 Requires PHP: 7.0.0
-Stable tag: 0.0.0-development
+Stable tag: 1.2.0
 License: GPL-3.0
 License URI: https://github.com/seattlewebco/wp-zoom/blob/master/LICENSE
 

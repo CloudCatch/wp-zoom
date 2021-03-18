@@ -1,0 +1,6 @@
+# [1.2.0](https://github.com/seattlewebco/wp-zoom/compare/1.1.1...1.2.0) (2021-02-19)
+
+
+### Features
+
+* auto changelog ([26df0aa](https://github.com/seattlewebco/wp-zoom/commit/26df0aa8f7fc2e2f2b0e9d5ea6bd9eae87db7f3e))

@@ -107,6 +107,8 @@ function wp_zoom_get_webinars( $post = null ) {
 			$webinars = (array) $webinars;
 		}
 
+		$webinars = array_filter( $webinars );
+
 		if ( ! empty( $webinars ) ) {
 			array_walk(
 				$webinars,
@@ -210,4 +212,12 @@ function wp_zoom_sanitize_recursive( $data ) {
 	}
 
 	return $data;
+}
+
+function wp_zoom_get_next_webinar_date_time( array $webinar ) {
+	$occurrences = $webinar['occurrences'] ?? array();
+
+	if ( ! empty( $occurrences ) ) {
+		return strtotime( $occurrences[0]['start_time'] );
+	}
 }

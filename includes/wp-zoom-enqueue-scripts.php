@@ -25,6 +25,8 @@ function wp_zoom_enqueue_scripts() {
 
 	wp_enqueue_script( 'wp-zoom-frontend' );
 
+	wp_enqueue_script( 'wp-zoom-countdown', WP_ZOOM_URL . 'assets/js/countdown.js', array(), WP_ZOOM_VER, true );
+
 	wp_register_script( 'wp-zoom-calendar', WP_ZOOM_URL . 'assets/js/calendar.js', array( 'jquery' ), WP_ZOOM_VER, true );
 
 	wp_localize_script(

@@ -13,7 +13,7 @@ use SeattleWebCo\WPZoom\Cache;
  * @return void
  */
 function wp_zoom_admin_menu() {
-	add_options_page( esc_html__( 'Zoom for WordPress', 'wp-zoom' ), esc_html__( 'Zoom for WordPress', 'wp-zoom' ), 'manage_options', 'wp-zoom', 'wp_zoom_options_page' );
+	add_options_page( esc_html__( 'Zoom for WordPress', 'wp-zoom' ), esc_html__( 'Zoom for WordPress', 'wp-zoom' ), 'wp_zoom_authorize', 'wp-zoom', 'wp_zoom_options_page' );
 }
 add_action( 'admin_menu', 'wp_zoom_admin_menu' );
 
@@ -48,8 +48,8 @@ function wp_zoom_options_page() {
 
 			<p>
 				<?php
-					/* translators: 1: Account user name */
-					printf( esc_html__( 'Connected to account: %s', 'wp-zoom' ), esc_html( $me['first_name'] . ' ' . $me['last_name'] ) );
+					/* translators: 1: Account user name 2: Account ID */
+					printf( esc_html__( 'Connected to account: %1$s (%2$s)', 'wp-zoom' ), esc_html( $me['first_name'] . ' ' . $me['last_name'] ), esc_html( $me['id'] ) );
 				?>
 			</p>
 			<p>
@@ -83,8 +83,8 @@ function wp_zoom_get_access_token() {
 		return;
 	}
 
-	delete_option( 'wp_zoom_oauth_tokens' );
-	delete_option( 'wp_zoom_user_id' );
+	delete_user_meta( get_current_user_id(), 'wp_zoom_oauth_tokens' );
+	delete_user_meta( get_current_user_id(), 'wp_zoom_user_id' );
 
 	Cache::delete_all();
 
@@ -99,12 +99,12 @@ function wp_zoom_get_access_token() {
 				)
 			);
 
-			$wp_zoom->update_access_token( $access_token );
+			$wp_zoom->update_access_token( $access_token, get_current_user_id() );
 
 			$me = $wp_zoom->get_me();
 
 			if ( ! empty( $me['id'] ) ) {
-				update_option( 'wp_zoom_user_id', $me['id'] );
+				update_user_meta( get_current_user_id(), 'wp_zoom_user_id', $me['id'] );
 			}
 
 			wp_safe_redirect( admin_url( 'options-general.php?page=wp-zoom' ) );
@@ -122,7 +122,7 @@ add_action( 'wp_loaded', 'wp_zoom_get_access_token' );
  * @return void
  */
 function wp_zoom_revoke_authorization() {
-	if ( ! current_user_can( 'manage_options' ) ) {
+	if ( ! current_user_can( 'wp_zoom_authorize' ) ) {
 		wp_die( esc_html__( 'You do not have permission to do that.', 'wp-zoom' ) );
 	}
 
@@ -131,8 +131,8 @@ function wp_zoom_revoke_authorization() {
 		wp_die( esc_html__( 'Invalid nonce, please try again.', 'wp-zoom' ) );
 	}
 
-	delete_option( 'wp_zoom_oauth_tokens' );
-	delete_option( 'wp_zoom_user_id' );
+	delete_user_meta( get_current_user_id(), 'wp_zoom_oauth_tokens' );
+	delete_user_meta( get_current_user_id(), 'wp_zoom_user_id' );
 
 	Cache::delete_all();
 
@@ -190,7 +190,7 @@ function wp_zoom_save_tokens() {
 		return;
 	}
 
-	if ( ! current_user_can( 'manage_options' ) ) {
+	if ( ! current_user_can( 'wp_zoom_authorize' ) ) {
 		wp_die( esc_html__( 'You do not have permission to do that.', 'wp-zoom' ) );
 	}
 
@@ -201,12 +201,12 @@ function wp_zoom_save_tokens() {
 		$tokens = json_decode( json_decode( stripslashes( $tokens ) ), true );
 
 		if ( isset( $tokens['access_token'] ) ) {
-			$wp_zoom->update_access_token( $tokens );
+			$wp_zoom->update_access_token( $tokens, get_current_user_id() );
 
 			$zoom_user = $wp_zoom->get_me();
 
 			if ( isset( $zoom_user['id'] ) ) {
-				update_option( 'wp_zoom_user_id', $zoom_user['id'] );
+				update_user_meta( get_current_user_id(), 'wp_zoom_user_id', $zoom_user['id'] );
 			}
 
 			wp_safe_redirect( admin_url( 'options-general.php?page=wp-zoom' ) );

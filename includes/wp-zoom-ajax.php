@@ -65,7 +65,7 @@ function wp_zoom_ajax_get_calendar_webinars() {
 					'start' => $occurrence['start_time'],
 					'end'   => wp_zoom_format_get_end_date_time( $occurrence['start_time'], $occurrence['duration'] ),
 					'title' => $webinar['topic'],
-					'url'   => $purchase_url,
+					'url'   => add_query_arg( array( 'occurrence_id' => $occurrence['occurrence_id'] ), $purchase_url ),
 				);
 			}
 		}

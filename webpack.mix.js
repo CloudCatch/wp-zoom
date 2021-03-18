@@ -72,9 +72,10 @@ mix.version();
  * @link https://laravel.com/docs/5.6/mix#working-with-scripts
  */
 mix
-  .js(`${devPath}/js/admin.js`, `${distPath}/js`)
-  .js(`${devPath}/js/frontend.js`, `${distPath}/js`)
-  .js(`${devPath}/js/calendar.js`, `${distPath}/js`);
+  .babel(`${devPath}/js/admin.js`, `${distPath}/js/admin.js`)
+  .babel(`${devPath}/js/frontend.js`, `${distPath}/js/frontend.js`)
+  .babel(`${devPath}/js/calendar.js`, `${distPath}/js/calendar.js`)
+  .babel(`${devPath}/js/countdown.js`, `${distPath}/js/countdown.js`);
 
 /*
  * Compile CSS. Mix supports Sass, Less, Stylus, and plain CSS, and has functions

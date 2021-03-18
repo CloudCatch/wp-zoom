@@ -24,7 +24,7 @@ function wp_zoom_render_field_select_webinars( array $args = array() ) {
 		)
 	);
 
-	$webinars = $wp_zoom->get_webinars( false );
+	$webinars = $wp_zoom->get_webinars( get_user_meta( get_current_user_id(), 'wp_zoom_user_id', true ), false );
 	?>
 
 	<select 
@@ -109,10 +109,11 @@ function wp_zoom_render_field_select_webinar_occurrence( array $webinar, array $
 				<option 
 					value="<?php echo esc_attr( $occurrence['occurrence_id'] ); ?>"
 					<?php echo esc_attr( $occurrence['status'] !== 'available' ? 'disabled' : '' ); ?>
+					<?php selected( in_array( $occurrence['occurrence_id'], $args['selected'] ), true ); ?>
 				>
 					<?php echo esc_html( wp_zoom_format_date_time( $occurrence['start_time'] ) ); ?>
 				</option>
-			<?php } ?>``
+			<?php } ?>
 
 		</select>
 
@@ -122,4 +123,8 @@ function wp_zoom_render_field_select_webinar_occurrence( array $webinar, array $
 
 		<?php
 	}
+}
+
+function wp_zoom_render_countdown_timer( array $webinar ) {
+	print wp_zoom_get_next_webinar_date_time( $webinar );
 }
