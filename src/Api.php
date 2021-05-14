@@ -112,28 +112,55 @@ class Api {
 		try {
 			$access_token = $this->get_access_token();
 
-			$request = $this->provider->getAuthenticatedRequest(
-				$method,
-				$uri,
-				$access_token,
-				array(
-					'headers' => $headers,
-					'body'    => $body,
-				)
-			);
+			if ( null !== $access_token ) {
+				$request = $this->provider->getAuthenticatedRequest(
+					$method,
+					$uri,
+					$access_token,
+					array(
+						'headers' => $headers,
+						'body'    => $body,
+					)
+				);
 
-			$response = $this->provider->getParsedResponse( $request );
+				$response = $this->provider->getParsedResponse( $request );
 
-			return $response;
+				return $response;
+			}
 		} catch ( InvalidTokenException $e ) {
 			delete_option( 'wp_zoom_oauth_tokens' );
 			delete_option( 'wp_zoom_user_id' );
 
 			Cache::delete_all();
 
+			Log::write(
+				$e->getMessage(),
+				'error',
+				array(
+					'uri'       => $uri,
+					'method'    => $method,
+					'body'      => $body,
+					'headers'   => $headers,
+				)
+			);
+
+			Log::write(
+				esc_html__( 'Disconnecting Zoom API connection.', 'wp-zoom' ),
+				'error'
+			);
+
 			do_action( 'wp_zoom_disconnected', $e );
 		} catch ( \Exception $e ) {
-			Log::write( $e->getMessage() );
+			Log::write(
+				$e->getMessage(),
+				'error',
+				array(
+					'uri'       => $uri,
+					'method'    => $method,
+					'body'      => $body,
+					'headers'   => $headers,
+				)
+			);
 		}
 
 		return array();
