@@ -18,8 +18,9 @@
 				WP_ZOOM_DIR . 'templates/shortcodes/list-single.php',
 				false,
 				array(
-					'data' => $object,
-					'url'  => $purchase_url,
+					'data'     => $object,
+					'products' => $purchase_products,
+					'url'      => $purchase_url,
 				)
 			);
 		}

@@ -647,8 +647,23 @@ add_filter( 'woocommerce_product_add_to_cart_url', 'wp_zoom_woocommerce_product_
  * @return void
  */
 function wp_zoom_woocommerce_list_info_action( $args ) {
-	if ( $args['url'] !== '#' ) {
-		printf( '<a href="%s" class="button wp-zoom-list-item--actions-button">%s</a>', esc_url( $args['url'] ), esc_html__( 'Register Now', 'wp-zoom' ) );
+	if ( ! empty( $args['products'] ) && is_array( $args['products'] ) ) {
+		$product_id = current( $args['products'] );
+
+		printf(
+			'<a href="%s" class="button wp-zoom-list-item--actions-button">%s</a>',
+			esc_url(
+				add_query_arg(
+					array(
+						'add-to-cart'   => $product_id,
+						'occurrence_id' => $args['data']['occurrence_id'] ?? null,
+					),
+					get_permalink( $product_id )
+				)
+			),
+			esc_html__( 'Add to Cart', 'wp-zoom' )
+		);
+		printf( '<a href="%s" class="button wp-zoom-list-item--actions-button">%s</a>', esc_url( get_permalink( $product_id ) ), esc_html__( 'View Details', 'wp-zoom' ) );
 	}
 }
 add_action( 'wp_zoom_list_after_info_actions', 'wp_zoom_woocommerce_list_info_action' );
