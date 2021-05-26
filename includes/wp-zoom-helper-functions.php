@@ -237,7 +237,7 @@ function wp_zoom_occurrence_available( array $webinar, string $occurrence_id ) {
  * Sanitize recursively
  *
  * @param array|string $data Data to sanitize.
- * @return array
+ * @return array|string
  */
 function wp_zoom_sanitize_recursive( $data ) {
 	if ( ! is_array( $data ) ) {
