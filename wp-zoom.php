@@ -28,6 +28,8 @@ require_once WP_ZOOM_DIR . 'includes/wp-zoom-api-functions.php';
 require_once WP_ZOOM_DIR . 'includes/wp-zoom-markup-functions.php';
 require_once WP_ZOOM_DIR . 'includes/wp-zoom-helper-functions.php';
 require_once WP_ZOOM_DIR . 'includes/integrations/wp-zoom-integrations.php';
+require_once WP_ZOOM_DIR . 'includes/shortcodes/wp-zoom-calendar-shortcode.php';
+require_once WP_ZOOM_DIR . 'includes/shortcodes/wp-zoom-list-shortcode.php';
 require_once WP_ZOOM_DIR . 'includes/wp-zoom-ajax.php';
 require_once WP_ZOOM_DIR . 'includes/wp-zoom-settings.php';
 

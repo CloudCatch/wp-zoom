@@ -20,6 +20,7 @@
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "vscode.typescript-language-features"
     },
+    "eslint.validate": ["javascript"],
     "intelephense.stubs": [
         "apache",
         "redis",

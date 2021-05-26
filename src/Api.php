@@ -286,4 +286,62 @@ class Api {
 		return $response;
 	}
 
+	/**
+	 * Get a single meeting
+	 *
+	 * @param string  $meeting_id The meeting ID.
+	 * @param boolean $cached Retrieve cached results or not.
+	 * @return array
+	 */
+	public function get_meeting( string $meeting_id, bool $cached = true ) {
+		if ( $cached ) {
+			$cache = Cache::get( 'wp_zoom_meeting_' . $meeting_id );
+
+			if ( false !== $cache ) {
+				return $cache;
+			}
+		}
+
+		$response = $this->request( $this->base_uri . '/meetings/' . $meeting_id, 'GET', null, array( 'Content-Type' => 'application/json;charset=UTF-8' ) );
+
+		if ( empty( $response ) ) {
+			return $response;
+		}
+
+		Cache::set( 'wp_zoom_meeting_' . $meeting_id, $response, 'wp_zoom_meetings' );
+
+		return $response;
+	}
+
+	/**
+	 * Get all meetings
+	 *
+	 * @param boolean $cached Retrieve cached results or not.
+	 * @return array
+	 */
+	public function get_meetings( bool $cached = true ) {
+		if ( $cached ) {
+			$cache = Cache::get( 'wp_zoom_meetings' );
+
+			if ( false !== $cache ) {
+				return $cache;
+			}
+		}
+
+		$response = $this->request(
+			add_query_arg( array( 'page_size' => 300 ), $this->base_uri . '/users/' . $this->user_id . '/meetings' ),
+			'GET',
+			null,
+			array( 'Content-Type' => 'application/json;charset=UTF-8' )
+		);
+
+		if ( empty( $response ) ) {
+			return $response;
+		}
+
+		Cache::set( 'wp_zoom_meetings', $response, 'wp_zoom_meetings' );
+
+		return $response;
+	}
+
 }

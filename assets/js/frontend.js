@@ -1,1 +1,39 @@
-(()=>{var o,a;o=jQuery,(a=o(".variations_form").wc_variation_form()).on("found_variation reset_data",(function(i,n){var r=void 0!==n?n.webinars:[];o(this).find(".wp-zoom-variation-webinar").remove(),r.map((function(n){console.log(i),a.block({message:null,overlayCSS:{background:"#fff",opacity:.6}}),o.ajax({url:wp_zoom.ajax_url,type:"GET",data:{action:"wp_zoom_woocommerce_get_variation_webinars",webinar:n},success:function(o){a.find(".wp-zoom-variation-webinar").remove(),a.find(".variations").after(o.html)},complete:function(){a.unblock()}})}))}))})();
+/******/ (() => { // webpackBootstrap
+var __webpack_exports__ = {};
+/*!**********************************!*\
+  !*** ./resources/js/frontend.js ***!
+  \**********************************/
+(function ($) {
+  var $form = $('.variations_form').wc_variation_form();
+  $form.on('found_variation reset_data', function (event, found_variation) {
+    var webinars = typeof found_variation !== 'undefined' ? found_variation.webinars : [];
+    $(this).find('.wp-zoom-variation-webinar').remove();
+    webinars.map(function (webinar) {
+      console.log(event);
+      $form.block({
+        message: null,
+        overlayCSS: {
+          background: '#fff',
+          opacity: 0.6
+        }
+      });
+      $.ajax({
+        url: wp_zoom.ajax_url,
+        type: 'GET',
+        data: {
+          action: 'wp_zoom_woocommerce_get_variation_webinars',
+          webinar: webinar
+        },
+        success: function success(webinar) {
+          $form.find('.wp-zoom-variation-webinar').remove();
+          $form.find('.variations').after(webinar.html);
+        },
+        complete: function complete() {
+          $form.unblock();
+        }
+      });
+    });
+  });
+})(jQuery);
+/******/ })()
+;

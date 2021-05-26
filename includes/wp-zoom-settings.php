@@ -23,46 +23,33 @@ add_action( 'admin_menu', 'wp_zoom_admin_menu' );
  * @return void
  */
 function wp_zoom_options_page() {
-	global $wp_zoom;
+	// phpcs:ignore
+	$tab = sanitize_key( $_REQUEST['tab'] ?? 'general' );
 	?>
 
 	<div class="wrap">
 		<h1><?php esc_html_e( 'Zoom for WordPress', 'wp-zoom' ); ?></h1>
 
+		<div class="wp-zoom-tabs">
+			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => 'general' ), admin_url( 'options-general.php?page=wp-zoom' ) ) ); ?>" class="wp-zoom-tab <?php echo esc_attr( $tab === 'general' ? 'active' : '' ); ?>">
+				<?php esc_html_e( 'General', 'wp-zoom' ); ?>
+			</a>
+			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => 'registration' ), admin_url( 'options-general.php?page=wp-zoom' ) ) ); ?>" class="wp-zoom-tab <?php echo esc_attr( $tab === 'registration' ? 'active' : '' ); ?>">
+				<?php esc_html_e( 'Registration', 'wp-zoom' ); ?>
+			</a>
+		</div>
+
 		<?php
-		$me = $wp_zoom->get_me();
+		switch ( $tab ) {
+			case 'registration':
+				load_template( WP_ZOOM_DIR . 'templates/settings/registration.php' );
+				break;
 
-		if ( empty( $me['id'] ) ) {
-			?>
-
-			<p>
-				<a class="button zoom-button" href="<?php echo esc_url( $wp_zoom->provider->getAuthorizationUrl() ); ?>">
-					<?php esc_html_e( 'Authorize with', 'wp-zoom' ); ?> 
-					<span class="zoom-icon"></span>
-				</a>
-			</p>
-
-			<?php
-		} else {
-			?>
-
-			<p>
-				<?php
-					/* translators: 1: Account user name */
-					printf( esc_html__( 'Connected to account: %s', 'wp-zoom' ), esc_html( $me['first_name'] . ' ' . $me['last_name'] ) );
-				?>
-			</p>
-			<p>
-				<a class="disconnect-wp-zoom button" href="<?php echo esc_url( \wp_nonce_url( admin_url( 'admin-post.php?action=wp_zoom_revoke' ), 'wp-zoom-revoke' ) ); ?>">
-					<?php esc_html_e( 'Revoke Zoom Authorization', 'wp-zoom' ); ?>
-				</a> 
-				<a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( 'purge_wp_zoom_cache' => 1 ) ), 'wp-zoom-purge-cache' ) ); ?>" class="button">
-					<?php esc_html_e( 'Purge Zoom API Cache', 'wp-zoom' ); ?>
-				</a>
-			</p>
-
-			<?php
+			case 'general':
+			default:
+				load_template( WP_ZOOM_DIR . 'templates/settings/general.php' );
 		}
+
 		?>
 
 	</div>
@@ -228,3 +215,118 @@ function wp_zoom_save_tokens() {
 	}
 }
 add_action( 'admin_init', 'wp_zoom_save_tokens', -10 );
+
+/**
+ * Outputs various types of settings fields
+ *
+ * @param string $field Field setting key.
+ * @param array  $args Field args.
+ * @return void
+ */
+function wp_zoom_render_settings_field( $field, $args ) {
+	$args = wp_parse_args(
+		$args,
+		array(
+			'type'        => 'text',
+			'label'       => '',
+			'cb_label'    => '',
+			'sanitize_cb' => '',
+			'default'     => '',
+		)
+	);
+
+	$settings = (array) get_option( 'wp_zoom_settings', array() );
+
+	$value = array_key_exists( $field, $settings ) ? $settings[ $field ] : $args['default'];
+	?>
+
+	<tr>
+		<th scope="row">
+			<label for="<?php echo esc_attr( $field ); ?>"><?php echo esc_html( $args['label'] ); ?></label>
+		</th>
+		<td>
+			<?php
+			switch ( $args['type'] ) {
+				case 'checkbox':
+					printf(
+						'<label><input type="checkbox" name="wp_zoom_settings[%1$s]" id="%1$s" value="yes" %2$s /> %3$s</label>',
+						esc_attr( $field ),
+						checked( 'yes', $value, false ),
+						esc_html( $args['cb_label'] )
+					);
+					break;
+
+				case 'text':
+				default:
+					printf( '<input type="text" name="wp_zoom_settings[%1$s]" id="%1$s" value="%2$s" />', esc_attr( $field ), esc_attr( $value ) );
+			}
+			?>
+		</td>
+	</tr>
+
+	<?php
+}
+
+/**
+ * Array of all settings fields
+ *
+ * @param string $tab Specific tab settings to retrieve.
+ * @return array
+ */
+function wp_zoom_get_settings_fields( $tab = '' ) {
+	$fields = apply_filters(
+		'wp_zoom_settings_fields',
+		array(
+			'general'      => array(),
+			'registration' => array(
+				'hide_webinar_occurrences_disabled' => array(
+					'label'       => esc_html__( 'Status', 'wp-zoom' ),
+					'type'        => 'checkbox',
+					'cb_label'    => esc_html__( 'Hide webinar occurrences unavailable for registration', 'wp-zoom' ),
+					'sanitize_cb' => function( $value ) {
+						return 'yes' === $value ? 'yes' : '';
+					},
+				),
+			),
+		)
+	);
+
+	if ( $tab && array_key_exists( $tab, $fields ) ) {
+		return $fields[ $tab ];
+	}
+
+	return $fields;
+}
+
+/**
+ * Handles saving form settings
+ *
+ * @return void
+ */
+function wp_zoom_settings_save() {
+	// phpcs:ignore
+	if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'] ?? '', 'wp-zoom-settings' ) ) {
+		wp_die( esc_html__( 'Invalid nonce, please try again.', 'wp-zoom' ) );
+	}
+
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'You do not have permission to do that.', 'wp-zoom' ) );
+	}
+
+	if ( empty( $_REQUEST['tab'] ) ) {
+		wp_die( esc_html__( 'Unable to save settings, please try again.', 'wp-zoom' ) );
+	}
+
+	$settings_fields  = wp_zoom_get_settings_fields( sanitize_text_field( wp_unslash( $_REQUEST['tab'] ) ) );
+	$updated_settings = get_option( 'wp_zoom_settings', array() );
+
+	foreach ( $settings_fields as $field => $args ) {
+		$updated_settings[ $field ] = sanitize_text_field( wp_unslash( $_REQUEST['wp_zoom_settings'][ $field ] ?? '' ) );
+	}
+
+	update_option( 'wp_zoom_settings', $updated_settings );
+
+	wp_safe_redirect( add_query_arg( 'updated', '1', wp_get_referer() ) );
+	exit;
+}
+add_action( 'admin_post_wp_zoom_settings', 'wp_zoom_settings_save' );

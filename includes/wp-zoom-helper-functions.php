@@ -12,9 +12,10 @@ use SeattleWebCo\WPZoom\Cache;
  *
  * @param string $datetime Date / time to format.
  * @param string $timezone Timezone.
+ * @param string $format Date format to return.
  * @return string
  */
-function wp_zoom_format_date_time( string $datetime, string $timezone = '' ) {
+function wp_zoom_format_date_time( string $datetime, string $timezone = '', string $format = '' ) {
 	$gmt_timezone   = new DateTimeZone( 'GMT' );
 	$local_timezone = new DateTimeZone( $timezone === '' ? wp_timezone_string() : $timezone );
 
@@ -24,7 +25,9 @@ function wp_zoom_format_date_time( string $datetime, string $timezone = '' ) {
 
 	$local_datetime = new DateTime( $gmt_datetime->format( 'Y-m-d H:i:s' ), $local_timezone );
 
-	return $local_datetime->format( apply_filters( 'wp_zoom_datetime_format', 'l, F jS, Y \a\t g:ia T' ) );
+	$format = $format === '' ? apply_filters( 'wp_zoom_datetime_format', 'l, F jS, Y \a\t g:ia T' ) : $format;
+
+	return $local_datetime->format( $format );
 }
 
 /**
@@ -122,6 +125,46 @@ function wp_zoom_get_webinars( $post = null ) {
 	}
 
 	return array();
+}
+
+/**
+ * Get all occurrences of meetings or webinars merged into an array
+ *
+ * @param string $type Either webinars or meetings.
+ * @return array
+ */
+function wp_zoom_get_occurrences( $type = 'webinars' ) {
+	global $wp_zoom;
+
+	$occurrences = array();
+	$objects     = call_user_func( array( $wp_zoom, 'get_' . $type ) );
+
+	foreach ( $objects[ $type ] as $object ) {
+		$object = call_user_func_array( array( $wp_zoom, 'get_' . substr( $type, 0, -1 ) ), array( $object['id'] ) );
+
+		if ( ! isset( $object['start_time'] ) && ! isset( $object['occurrences'] ) ) {
+			continue;
+		}
+
+		if ( isset( $object['occurrences'] ) ) {
+			foreach ( $object['occurrences'] as $occurrence ) {
+				$occurrence = array_merge( $object, $occurrence );
+
+				$occurrences[] = $occurrence;
+			}
+		} else {
+			$occurrences[] = $object;
+		}
+	}
+
+	usort(
+		$occurrences,
+		function( $a, $b ) {
+			return strtotime( $a['start_time'] ) - strtotime( $b['start_time'] );
+		}
+	);
+
+	return $occurrences;
 }
 
 /**

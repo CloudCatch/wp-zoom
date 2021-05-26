@@ -630,3 +630,16 @@ function wp_zoom_woocommerce_product_add_to_cart_url( $url, $product ) {
 	return $url;
 }
 add_filter( 'woocommerce_product_add_to_cart_url', 'wp_zoom_woocommerce_product_add_to_cart_url', 10, 2 );
+
+/**
+ * Display buttons to register or view more details
+ *
+ * @param array $args Shortcode data and arguments.
+ * @return void
+ */
+function wp_zoom_woocommerce_list_info_action( $args ) {
+	if ( $args['url'] !== '#' ) {
+		printf( '<a href="%s" class="button wp-zoom-list-item--actions-button">%s</a>', esc_url( $args['url'] ), esc_html__( 'Register Now', 'wp-zoom' ) );
+	}
+}
+add_action( 'wp_zoom_list_after_info_actions', 'wp_zoom_woocommerce_list_info_action' );
