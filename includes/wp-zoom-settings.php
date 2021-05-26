@@ -42,12 +42,12 @@ function wp_zoom_options_page() {
 		<?php
 		switch ( $tab ) {
 			case 'registration':
-				load_template( WP_ZOOM_DIR . 'templates/settings/registration.php' );
+				wp_zoom_load_template( 'settings/registration.php' );
 				break;
 
 			case 'general':
 			default:
-				load_template( WP_ZOOM_DIR . 'templates/settings/general.php' );
+				wp_zoom_load_template( 'settings/general.php' );
 		}
 
 		?>

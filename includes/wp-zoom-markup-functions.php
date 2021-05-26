@@ -6,6 +6,24 @@
  */
 
 /**
+ * Load template from plugin or theme overrides
+ *
+ * @param string  $template_file Template file to load.
+ * @param boolean $require_once Whether to require once.
+ * @param array   $args Arguments passed to template file.
+ * @return void
+ */
+function wp_zoom_load_template( $template_file, $require_once = true, $args = array() ) {
+	$override = locate_template( 'wp-zoom/' . $template_file );
+
+	if ( $override ) {
+		load_template( $override, $require_once, $args );
+	} else {
+		load_template( WP_ZOOM_DIR . 'templates/' . $template_file, $require_once, $args );
+	}
+}
+
+/**
  * Render field which displays available webinars
  *
  * @param array $args <select> field arguments.

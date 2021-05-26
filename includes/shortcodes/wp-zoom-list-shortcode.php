@@ -42,8 +42,8 @@ function wp_zoom_list_shortcode( $atts, $content = '' ) {
 
 	ob_start();
 
-	load_template(
-		WP_ZOOM_DIR . 'templates/shortcodes/list.php',
+	wp_zoom_load_template(
+		'shortcodes/list.php',
 		false,
 		array(
 			'data'  => $data,

@@ -14,8 +14,8 @@
 			$purchase_products = wp_zoom_get_purchase_products( $object['id'] );
 			$purchase_url      = $purchase_products ? get_permalink( current( $purchase_products ) ) : '#';
 
-			load_template(
-				WP_ZOOM_DIR . 'templates/shortcodes/list-single.php',
+			wp_zoom_load_template(
+				'shortcodes/list-single.php',
 				false,
 				array(
 					'data'     => $object,
