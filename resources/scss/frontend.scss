@@ -64,6 +64,7 @@
 
 			> li {
 				margin: 0 3px 3px 0;
+				list-style: none;
 			}
 
 			.page-numbers {
@@ -75,6 +76,7 @@
 				align-items: center;
 				justify-content: center;
 				border: 1px solid #ccc;
+				text-decoration: none;
 
 				&.current {
 					background: #f5f5f5;
