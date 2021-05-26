@@ -2,7 +2,7 @@
 Contributors: dkjensen, seattlewebco
 Tags: zoom,webinars,meetings,woocommerce
 Requires at least: 5.4
-Tested up to: 5.6.1
+Tested up to: 5.7.2
 Requires PHP: 7.0.0
 Stable tag: 0.0.0-development
 License: GPL-3.0

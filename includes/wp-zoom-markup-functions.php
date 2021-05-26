@@ -109,10 +109,11 @@ function wp_zoom_render_field_select_webinar_occurrence( array $webinar, array $
 				<option 
 					value="<?php echo esc_attr( $occurrence['occurrence_id'] ); ?>"
 					<?php echo esc_attr( $occurrence['status'] !== 'available' ? 'disabled' : '' ); ?>
+					<?php selected( in_array( $occurrence['occurrence_id'], $args['selected'] ), true ); ?>
 				>
 					<?php echo esc_html( wp_zoom_format_date_time( $occurrence['start_time'] ) ); ?>
 				</option>
-			<?php } ?>``
+			<?php } ?>
 
 		</select>
 

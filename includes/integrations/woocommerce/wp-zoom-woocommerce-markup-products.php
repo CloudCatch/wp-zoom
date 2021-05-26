@@ -30,7 +30,8 @@ function wp_zoom_single_product_summary() {
 						wp_zoom_render_field_webinar(
 							$webinar,
 							array(
-								'name' => esc_attr( '_wp_zoom_webinars_occurrences[' . $webinar['id'] . ']' ),
+								'name'     => esc_attr( '_wp_zoom_webinars_occurrences[' . $webinar['id'] . ']' ),
+								'selected' => array( intval( $_REQUEST['occurrence_id'] ?? 0 ) ),
 							)
 						);
 						?>
@@ -107,6 +108,10 @@ function wp_zoom_add_cart_item_data( $cart_item_data, $product_id, $variation_id
 		// phpcs:ignore
 		$occurrence_id = intval( $_POST['_wp_zoom_webinars_occurrences'][ $webinar['id'] ] ?? '' );
 
+		if ( empty( $occurrence_id ) ) {
+			$occurrence_id = intval( $_REQUEST['occurrence_id'] ?? 0 );
+		}
+
 		$cart_item_data['wp_zoom_webinars_occurrences'][ $webinar['id'] ] = wp_zoom_get_available_webinar_occurrence( $webinar, (string) $occurrence_id );
 	}
 
@@ -134,6 +139,10 @@ function wp_zoom_add_to_cart_validation( $passed, $product_id, $quantity, $varia
 
             // phpcs:ignore
 			$occurrence_id = (string) intval( $_POST['_wp_zoom_webinars_occurrences'][ $webinar['id'] ] ?? '' );
+
+			if ( empty( $occurrence_id ) ) {
+				$occurrence_id = intval( $_REQUEST['occurrence_id'] ?? 0 );
+			}
 
 			if ( empty( $occurrence_id ) ) {
 				wc_add_notice( esc_html__( 'Please select a date and time for each webinar.', 'wp-zoom' ), 'error' );
