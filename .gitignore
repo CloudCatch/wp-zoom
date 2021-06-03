@@ -62,6 +62,7 @@ node_modules
 /build/
 /coverage/
 /assets/
+/languages/
 mix-manifest.json
 
 # PhpStrom Project Files #
