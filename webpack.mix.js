@@ -146,9 +146,15 @@ mix.webpackConfig({
   externals: { jquery: "jQuery" },
   plugins: [
     // @link https://github.com/webpack-contrib/copy-webpack-plugin
-    new CopyWebpackPlugin([
-      { from: `${devPath}/fonts`, to: `${distPath}/fonts` },
-    ])
+    new CopyWebpackPlugin( {
+		patterns: [ 
+			{
+				from            : `${devPath}/fonts`,
+				to              : `${distPath}/fonts`, 
+				noErrorOnMissing: true
+			} 
+		]
+	} )
   ]
 });
 
