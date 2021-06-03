@@ -11,15 +11,15 @@
 	<?php
 	if ( ! empty( $args['data'] ) ) {
 		foreach ( $args['data'] as $object ) {
-			$purchase_products = wp_zoom_get_purchase_products( $object['id'] );
-			$purchase_url      = $purchase_products ? get_permalink( current( $purchase_products ) ) : '#';
+			$purchase_product = wp_zoom_get_purchase_product( $object['id'] );
+			$purchase_url     = $purchase_product ? get_permalink( $purchase_products ) : null;
 
 			wp_zoom_load_template(
 				'shortcodes/list-single.php',
 				false,
 				array(
 					'data'     => $object,
-					'products' => $purchase_products,
+					'product'  => $purchase_product,
 					'url'      => $purchase_url,
 				)
 			);

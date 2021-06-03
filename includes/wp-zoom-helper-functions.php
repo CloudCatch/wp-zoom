@@ -87,6 +87,22 @@ function wp_zoom_get_purchase_products( string $webinar_id ) {
 }
 
 /**
+ * Get the purchase product for a given webinar.
+ *
+ * @param string $webinar_id The webinar ID to check.
+ * @return null|integer
+ */
+function wp_zoom_get_purchase_product( string $webinar_id ) {
+	$products = wp_zoom_get_purchase_products( $webinar_id );
+
+	if ( ! empty( $products ) && is_array( $products ) ) {
+		return absint( current( $products ) );
+	}
+
+	return null;
+}
+
+/**
  * Get webinars for a given post
  *
  * @param integer|WP_Post $post Post to check.

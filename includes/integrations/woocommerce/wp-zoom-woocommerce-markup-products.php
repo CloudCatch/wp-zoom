@@ -641,29 +641,42 @@ function wp_zoom_woocommerce_product_add_to_cart_url( $url, $product ) {
 add_filter( 'woocommerce_product_add_to_cart_url', 'wp_zoom_woocommerce_product_add_to_cart_url', 10, 2 );
 
 /**
+ * Display product excerpt
+ *
+ * @param array $args Shortcode data and arguments.
+ * @return void
+ */
+function wp_zoom_woocommerce_list_after_info( $args ) {
+	if ( $args['product'] ) {
+		$product = wc_get_product( $args['product'] );
+
+		/* phpcs:ignore WordPress.Security.EscapeOutput */
+		printf( '<p class="wp-zoom-list-item--info-excerpt">%s</p>', $product->get_short_description() );
+	}
+}
+add_action( 'wp_zoom_list_after_info', 'wp_zoom_woocommerce_list_after_info' );
+
+/**
  * Display buttons to register or view more details
  *
  * @param array $args Shortcode data and arguments.
  * @return void
  */
 function wp_zoom_woocommerce_list_info_action( $args ) {
-	if ( ! empty( $args['products'] ) && is_array( $args['products'] ) ) {
-		$product_id = current( $args['products'] );
-
+	if ( $args['product'] ) {
 		printf(
-			'<a href="%s" class="button wp-zoom-list-item--actions-button">%s</a>',
+			'<a href="%s" class="button wp-zoom-list-item--info-actions-button add_to_cart_button">%s</a>',
 			esc_url(
 				add_query_arg(
 					array(
-						'add-to-cart'   => $product_id,
+						'add-to-cart'   => $args['product'],
 						'occurrence_id' => $args['data']['occurrence_id'] ?? null,
 					),
-					get_permalink( $product_id )
+					get_permalink( $args['product'] )
 				)
 			),
-			esc_html__( 'Add to Cart', 'wp-zoom' )
+			esc_html__( 'Add to cart', 'wp-zoom' )
 		);
-		printf( '<a href="%s" class="button wp-zoom-list-item--actions-button">%s</a>', esc_url( get_permalink( $product_id ) ), esc_html__( 'View Details', 'wp-zoom' ) );
 	}
 }
 add_action( 'wp_zoom_list_after_info_actions', 'wp_zoom_woocommerce_list_info_action' );
