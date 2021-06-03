@@ -2,6 +2,7 @@
 /.wordpress-org
 /.git
 /.github
+/.husky
 /.babelrc
 /.eslintignore
 /.vscode
@@ -18,6 +19,7 @@
 
 # Files
 .babelrc
+.commitlintrc.js
 .distignore
 .env
 .eslintignore
