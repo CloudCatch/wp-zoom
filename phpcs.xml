@@ -29,6 +29,7 @@
 		<exclude name="WordPress.NamingConventions.PrefixAllGlobals.ShortPrefixPassed"/>
 		<exclude name="WordPress.PHP.YodaConditions"/>
 		<exclude name="WordPress.DB.PreparedSQL"/>
+		<exclude name="WordPress.PHP.StrictInArray"/>
 	</rule>
 
 	<rule ref="WordPress.WP.I18n">
