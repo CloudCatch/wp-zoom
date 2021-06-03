@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap file
  *
- * @package Power_Over_Predators
+ * @package SeattleWebCo\WPZoom
  */
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' );

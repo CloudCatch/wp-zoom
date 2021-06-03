@@ -1,4 +1,9 @@
 <?php
+/**
+ * Product helpers.
+ *
+ * @package SeattleWebCo\WPZoom
+ */
 
 /**
  * Class WC_Helper_Customer.
