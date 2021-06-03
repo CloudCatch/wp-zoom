@@ -87,47 +87,48 @@ mix
 
 // Sass configuration.
 var sassConfig = {
-  outputStyle: "compressed",
-  indentType: "tab",
-  indentWidth: 1,
+	outputStyle: "compressed",
+	indentType : "tab",
+	indentWidth: 1,
 };
 
 // Compile SASS/CSS.
 mix
-  .sass(`${devPath}/scss/admin.scss`, `${distPath}/css`, sassConfig)
-  .options({
-    postCss: [
-      require("cssnano")({
-        preset: [
-          "default",
-          {
-            discardComments: {
-              removeAll: true,
-            },
-          },
-        ],
-      }),
-    ],
-  })
-  .sass(
-    `${devPath}/scss/frontend.scss`,
-    `${distPath}/css`,
-    sassConfig
-  )
-  .options({
-    postCss: [
-      require("cssnano")({
-        preset: [
-          "default",
-          {
-            discardComments: {
-              removeAll: true,
-            },
-          },
-        ],
-      }),
-    ],
-  });
+	.sass( `${devPath}/scss/admin.scss`, `${distPath}/css` )
+	.options( {
+		sassOptions: sassConfig,
+		postCss    : [
+			require( "cssnano" )( {
+				preset: [
+					"default",
+					{
+						discardComments: {
+							removeAll: true,
+						},
+					},
+				],
+			} ),
+		],
+	} )
+	.sass(
+		`${devPath}/scss/frontend.scss`,
+		`${distPath}/css`
+	)
+	.options( {
+		sassOptions: sassConfig,
+		postCss    : [
+			require( "cssnano" )( {
+				preset: [
+					"default",
+					{
+						discardComments: {
+							removeAll: true,
+						},
+					},
+				],
+			} ),
+		],
+	} );
 
 /*
  * Add custom Webpack configuration.
