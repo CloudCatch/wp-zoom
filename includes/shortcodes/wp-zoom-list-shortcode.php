@@ -15,8 +15,9 @@
 function wp_zoom_list_shortcode( $atts, $content = '' ) {
 	$atts = shortcode_atts(
 		array(
-			'type'     => 'webinars',
-			'per_page' => 20,
+			'type'      => 'webinars',
+			'per_page'  => 20,
+			'show_past' => 0,
 		),
 		$atts
 	);
@@ -27,7 +28,7 @@ function wp_zoom_list_shortcode( $atts, $content = '' ) {
 
 	$page     = get_query_var( 'paged', 1 );
 	$per_page = intval( $atts['per_page'] );
-	$data     = wp_zoom_get_occurrences( $atts['type'] );
+	$data     = wp_zoom_get_occurrences( $atts['type'], (bool) $atts['show_past'] );
 	$total    = count( $data );
 
 	if ( $page < 2 ) {

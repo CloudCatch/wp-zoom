@@ -8,6 +8,21 @@
 use SeattleWebCo\WPZoom\Cache;
 
 /**
+ * Return a DateTime object with the GMT end time
+ *
+ * @param string  $datetime Date / time to get end.
+ * @param integer $duration Duration in minutes.
+ * @return DateTime
+ */
+function wp_zoom_end_date_time( string $datetime, int $duration ) {
+	$gmt_timezone = new DateTimeZone( 'GMT' );
+	$gmt_datetime = new DateTime( trim( $datetime, 'Z' ), $gmt_timezone );
+	$gmt_datetime->add( DateInterval::createFromDateString( (string) $duration . 'minutes' ) );
+
+	return $gmt_datetime;
+}
+
+/**
  * Format date / time string
  *
  * @param string $datetime Date / time to format.
@@ -37,7 +52,7 @@ function wp_zoom_format_date_time( string $datetime, string $timezone = '', stri
  * @param integer $duration Duration in minutes.
  * @return string
  */
-function wp_zoom_format_get_end_date_time( string $datetime, int $duration ) {
+function wp_zoom_format_end_date_time( string $datetime, int $duration ) {
 	$gmt_timezone = new DateTimeZone( 'GMT' );
 
 	$gmt_datetime = new DateTime( trim( $datetime, 'Z' ), $gmt_timezone );
@@ -146,10 +161,11 @@ function wp_zoom_get_webinars( $post = null ) {
 /**
  * Get all occurrences of meetings or webinars merged into an array
  *
- * @param string $type Either webinars or meetings.
+ * @param string  $type Either webinars or meetings.
+ * @param boolean $show_past Whether to show occurrences that have ended.
  * @return array
  */
-function wp_zoom_get_occurrences( $type = 'webinars' ) {
+function wp_zoom_get_occurrences( $type = 'webinars', $show_past = false ) {
 	global $wp_zoom;
 
 	$occurrences = array();
@@ -179,6 +195,17 @@ function wp_zoom_get_occurrences( $type = 'webinars' ) {
 			return strtotime( $a['start_time'] ) - strtotime( $b['start_time'] );
 		}
 	);
+
+	if ( ! $show_past ) {
+		$occurrences = array_filter(
+			$occurrences,
+			function( $occurrence ) {
+				$end = wp_zoom_end_date_time( (string) $occurrence['start_time'], (int) $occurrence['duration'] );
+
+				return $end->getTimestamp() > time();
+			}
+		);
+	}
 
 	return $occurrences;
 }
