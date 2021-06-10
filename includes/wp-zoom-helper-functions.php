@@ -172,7 +172,10 @@ function wp_zoom_get_occurrences( $type = 'webinars', $show_past = false ) {
 	$objects     = call_user_func( array( $wp_zoom, 'get_' . $type ) );
 
 	foreach ( $objects[ $type ] as $object ) {
-		$object = call_user_func_array( array( $wp_zoom, 'get_' . substr( $type, 0, -1 ) ), array( $object['id'] ) );
+		// phpcs:ignore WordPress.PHP.StrictComparisons
+		if ( $type == 8 || $type == 9 ) {
+			$object = call_user_func_array( array( $wp_zoom, 'get_' . substr( $type, 0, -1 ) ), array( $object['id'] ) );
+		}
 
 		if ( ! isset( $object['start_time'] ) && ! isset( $object['occurrences'] ) ) {
 			continue;
