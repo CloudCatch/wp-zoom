@@ -682,49 +682,43 @@ function wp_zoom_woocommerce_list_info_action( $args ) {
 add_action( 'wp_zoom_list_after_info_actions', 'wp_zoom_woocommerce_list_info_action' );
 
 /**
- * Populate occurrence data with associated products
+ * Filter list occurrences by product category and populate data products
  *
  * @param array $data Array of occurrences.
  * @param array $atts Shortcode attributes.
  * @return array
  */
-function wp_zoom_woocommerce_list_object_product( $data, $atts ) {
-	$data = array_map(
-		function( $object ) {
-			$object['product'] = null;
+function wp_zoom_woocommerce_list_data( $data, $atts ) {
+	$categories = $atts['category'] ? array_map( 'trim', explode( ',', $atts['category'] ) ) : array();
 
-			$purchase_product = wp_zoom_get_purchase_product( $object['id'] );
+	foreach ( $data as $key => &$object ) {
+		$object['product']  = null;
+		$object['products'] = (array) wp_zoom_get_purchase_products( $object['id'] );
 
-			$object['product'] = $purchase_product;
+		if ( $categories ) {
+			$keep = false;
 
-			return $object;
-		},
-		$data
-	);
+			foreach ( $object['products'] as $product ) {
+				$in_category = is_object_in_term( $product, 'product_cat', $categories );
 
-	return $data;
-}
-add_filter( 'wp_zoom_list_shortcode_data', 'wp_zoom_woocommerce_list_object_product', 10, 2 );
+				if ( $in_category ) {
+					$object['product'] = $product;
 
-/**
- * Filter list occurrences by product category
- *
- * @param array $data Array of occurrences.
- * @param array $atts Shortcode attributes.
- * @return array
- */
-function wp_zoom_woocommerce_list_object_category( $data, $atts ) {
-	if ( $atts['category'] ) {
-		$categories = array_map( 'trim', explode( ',', $atts['category'] ) );
-
-		$data = array_filter(
-			$data,
-			function( $object ) use ( $categories ) {
-				return $object['product'] ? is_object_in_term( $object['product'], 'product_cat', $categories ) : false;
+					$keep = true;
+					break;
+				}
 			}
-		);
+
+			if ( ! $keep ) {
+				unset( $data[ $key ] );
+			}
+		}
+
+		if ( ! $object['product'] ) {
+			$object['product'] = absint( current( $object['products'] ) );
+		}
 	}
 
 	return $data;
 }
-add_filter( 'wp_zoom_list_shortcode_data', 'wp_zoom_woocommerce_list_object_category', 15, 2 );
+add_filter( 'wp_zoom_list_shortcode_data', 'wp_zoom_woocommerce_list_data', 10, 2 );
