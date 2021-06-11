@@ -18,6 +18,7 @@ function wp_zoom_list_shortcode( $atts, $content = '' ) {
 			'type'      => 'webinars',
 			'per_page'  => 20,
 			'show_past' => 0,
+			'category'  => null,
 		),
 		$atts
 	);
@@ -29,6 +30,7 @@ function wp_zoom_list_shortcode( $atts, $content = '' ) {
 	$page     = get_query_var( 'paged', 1 );
 	$per_page = intval( $atts['per_page'] );
 	$data     = wp_zoom_get_occurrences( $atts['type'], (bool) $atts['show_past'] );
+	$data     = apply_filters( 'wp_zoom_list_shortcode_data', $data, $atts );
 	$total    = count( $data );
 
 	if ( $page < 2 ) {
@@ -38,8 +40,6 @@ function wp_zoom_list_shortcode( $atts, $content = '' ) {
 	if ( $per_page > 0 ) {
 		$data = array_slice( $data, ( $page - 1 ) * $per_page, $per_page );
 	}
-
-	$data = apply_filters( 'wp_zoom_list_shortcode_data', $data, $atts );
 
 	ob_start();
 

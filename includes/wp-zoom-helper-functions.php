@@ -70,35 +70,42 @@ function wp_zoom_format_end_date_time( string $datetime, int $duration ) {
 function wp_zoom_get_purchase_products( string $webinar_id ) {
 	global $wpdb;
 
-	$cache = Cache::get( 'wp_zoom_webinar_purchase_products_' . $webinar_id );
-
-	if ( false !== $cache ) {
-		return $cache;
-	}
-
 	$webinar_id = (string) intval( $webinar_id );
+	$products   = array();
+	$_products  = Cache::get( 'wp_zoom_webinar_purchase_products' );
 
-	// phpcs:ignore
-	$products = $wpdb->get_col(
-		"
-		SELECT pm.post_id
-		FROM   {$wpdb->postmeta} pm
+	if ( false === $_products ) {
+		// phpcs:ignore
+		$_products = $wpdb->get_results(
+			"
+			SELECT pm.post_id, pm.meta_value
+			FROM   {$wpdb->postmeta} pm
 			INNER JOIN {$wpdb->postmeta} pm2
-					ON pm2.meta_key = '_wp_zoom_webinars'
-					AND pm2.meta_value LIKE '%{$webinar_id}%'
-					AND pm2.post_id = pm.post_id
-		WHERE  pm.meta_key = '_wp_zoom_purchase_url'
-			AND pm.meta_value = 'yes' 
-	"
-	);
+				ON pm2.post_id = pm.post_id
+				AND pm2.meta_key = '_wp_zoom_purchase_url'
+			WHERE  pm.meta_key = '_wp_zoom_webinars'
+				AND pm2.meta_value = 'yes' 
+			GROUP BY pm.post_id
+		",
+			ARRAY_A
+		);
 
-	if ( empty( $products ) ) {
-		return null;
+		if ( empty( $_products ) ) {
+			return null;
+		}
+
+		Cache::set( 'wp_zoom_webinar_purchase_products', $_products );
 	}
 
-	Cache::set( 'wp_zoom_webinar_purchase_products_' . $webinar_id, $products );
+	foreach ( $_products as $product ) {
+		$webinars = maybe_unserialize( $product['meta_value'] );
 
-	return $products;
+		if ( in_array( $webinar_id, $webinars ) ) {
+			$products[] = $product['post_id'];
+		}
+	}
+
+	return array_unique( $products );
 }
 
 /**
@@ -173,7 +180,7 @@ function wp_zoom_get_occurrences( $type = 'webinars', $show_past = false ) {
 
 	foreach ( $objects[ $type ] as $object ) {
 		// phpcs:ignore WordPress.PHP.StrictComparisons
-		if ( $type == 8 || $type == 9 ) {
+		if ( $object['type'] == 8 || $object['type'] == 9 ) {
 			$object = call_user_func_array( array( $wp_zoom, 'get_' . substr( $type, 0, -1 ) ), array( $object['id'] ) );
 		}
 

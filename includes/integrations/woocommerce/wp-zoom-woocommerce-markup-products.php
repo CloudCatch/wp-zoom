@@ -670,7 +670,7 @@ function wp_zoom_woocommerce_list_info_action( $args ) {
 				add_query_arg(
 					array(
 						'add-to-cart'   => $args['product'],
-						'occurrence_id' => $args['data']['occurrence_id'] ?? null,
+						'occurrence_id' => $args['occurrence_id'] ?? null,
 					),
 					get_permalink( $args['product'] )
 				)
@@ -680,3 +680,51 @@ function wp_zoom_woocommerce_list_info_action( $args ) {
 	}
 }
 add_action( 'wp_zoom_list_after_info_actions', 'wp_zoom_woocommerce_list_info_action' );
+
+/**
+ * Populate occurrence data with associated products
+ *
+ * @param array $data Array of occurrences.
+ * @param array $atts Shortcode attributes.
+ * @return array
+ */
+function wp_zoom_woocommerce_list_object_product( $data, $atts ) {
+	$data = array_map(
+		function( $object ) {
+			$object['product'] = null;
+
+			$purchase_product = wp_zoom_get_purchase_product( $object['id'] );
+
+			$object['product'] = $purchase_product;
+
+			return $object;
+		},
+		$data
+	);
+
+	return $data;
+}
+add_filter( 'wp_zoom_list_shortcode_data', 'wp_zoom_woocommerce_list_object_product', 10, 2 );
+
+/**
+ * Filter list occurrences by product category
+ *
+ * @param array $data Array of occurrences.
+ * @param array $atts Shortcode attributes.
+ * @return array
+ */
+function wp_zoom_woocommerce_list_object_category( $data, $atts ) {
+	if ( $atts['category'] ) {
+		$categories = array_map( 'trim', explode( ',', $atts['category'] ) );
+
+		$data = array_filter(
+			$data,
+			function( $object ) use ( $categories ) {
+				return $object['product'] ? is_object_in_term( $object['product'], 'product_cat', $categories ) : false;
+			}
+		);
+	}
+
+	return $data;
+}
+add_filter( 'wp_zoom_list_shortcode_data', 'wp_zoom_woocommerce_list_object_category', 15, 2 );
