@@ -190,6 +190,10 @@ function wp_zoom_get_occurrences( $type = 'webinars', $show_past = false ) {
 
 		if ( isset( $object['occurrences'] ) ) {
 			foreach ( $object['occurrences'] as $occurrence ) {
+				if ( $occurrence['status'] !== 'available' ) {
+					continue;
+				}
+
 				$occurrence = array_merge( $object, $occurrence );
 
 				$occurrences[] = $occurrence;
