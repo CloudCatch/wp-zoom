@@ -84,7 +84,7 @@ class Zoom extends AbstractProvider {
 	 */
 	protected function getDefaultScopes() {
 		return array(
-			'user_profile',
+			'user:read',
 			'webinar:read',
 			'webinar:write',
 		);
