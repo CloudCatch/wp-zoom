@@ -37,7 +37,6 @@ if ( defined( 'WP_ZOOM_CLIENT_ID' ) && defined( 'WP_ZOOM_CLIENT_SECRET' ) ) {
 	$wp_zoom_provider = new \SeattleWebCo\WPZoom\Provider\Zoom(
 		array(
 			'redirectUri'   => admin_url( 'options-general.php?page=wp-zoom' ),
-			'timeout'       => 30,
 			'clientId'      => constant( 'WP_ZOOM_CLIENT_ID' ),
 			'clientSecret'  => constant( 'WP_ZOOM_CLIENT_SECRET' ),
 		)
@@ -46,7 +45,6 @@ if ( defined( 'WP_ZOOM_CLIENT_ID' ) && defined( 'WP_ZOOM_CLIENT_SECRET' ) ) {
 	$wp_zoom_provider = new \SeattleWebCo\WPZoom\Provider\ZoomForWp(
 		array(
 			'redirectUri' => admin_url( 'options-general.php?page=wp-zoom' ),
-			'timeout'     => 30,
 		)
 	);
 }
