@@ -75,6 +75,8 @@ class Api {
 			$access_token->jsonSerialize()
 		);
 
+		Cache::delete_all();
+
 		return $access_token;
 	}
 

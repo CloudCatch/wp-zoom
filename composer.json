@@ -15,7 +15,10 @@
   },
   "config": {
     "platform": {
-      "php": "7.0.0"
+      "php": "8.0.0"
+    },
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
     }
   },
   "repositories": [],
@@ -24,8 +27,6 @@
     "monolog/monolog": "^1.25"
   },
   "require-dev": {
-    "phpunit/phpunit": "^6",
-    "phpunit/php-code-coverage": "^5",
     "phpcompatibility/phpcompatibility-wp": "*",
     "php-stubs/wordpress-stubs": "^5.4",
     "phpcompatibility/php-compatibility": "^9.3",
