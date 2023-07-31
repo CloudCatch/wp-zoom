@@ -127,6 +127,17 @@ class Api {
 
 				$response = $this->provider->getParsedResponse( $request );
 
+				Log::write(
+					esc_html__( 'API Request Succeeded.', 'wp-zoom' ),
+					'debug',
+					array(
+						'uri'       => $uri,
+						'method'    => $method,
+						'body'      => $body,
+						'headers'   => $headers,
+					)
+				);
+
 				return $response;
 			}
 		} catch ( InvalidTokenException $e ) {

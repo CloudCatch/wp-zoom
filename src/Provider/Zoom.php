@@ -116,8 +116,9 @@ class Zoom extends AbstractProvider {
 			throw new ApiRequestException(
 				sprintf(
 					/* translators: 1: Response message */
-					__( 'Error recieved from Zoom API: %1$s', 'wp-zoom' ),
-					wp_json_encode( $data )
+					__( 'Error recieved from Zoom API: %1$s | %2$s', 'wp-zoom' ),
+					wp_json_encode( $data ),
+					wp_json_encode( $response )
 				)
 			);
 		}
