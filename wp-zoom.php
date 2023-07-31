@@ -3,8 +3,8 @@
  * Plugin Name:     Zoom for WordPress
  * Description:     Simple Zoom integration with WordPress makes anything possible
  * Version:         0.0.0-development
- * Author:          Seattle Web Co.
- * Author URI:      https://seattlewebco.com
+ * Author:          CloudCatch LLC
+ * Author URI:      https://cloudcatch.io
  * Text Domain:     wp-zoom
  * Domain Path:     /languages/
  * Contributors:    seattlewebco, dkjensen

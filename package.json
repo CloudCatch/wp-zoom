@@ -6,7 +6,7 @@
     "type": "git",
     "url": "git+https://github.com/seattlewebco/wp-zoom.git"
   },
-  "author": "Seattle Web Co.",
+  "author": "CloudCatch LLC",
   "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/seattlewebco/wp-zoom/issues"
@@ -74,8 +74,8 @@
     "vue-template-compiler": "^2.6.10"
   },
   "scripts": {
-    "build": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --config=node_modules/laravel-mix/setup/webpack.config.js",
-    "watch": "cross-env sync=1 NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --config=node_modules/laravel-mix/setup/webpack.config.js",
     "lint": "npm run lint:styles && npm run lint:scripts && npm run lint:php",
     "lint:styles": "cross-env stylelint './resources/scss/**/*.scss' --syntax scss",
     "lint:scripts": "cross-env eslint './resources/js/*.js'",
@@ -83,7 +83,7 @@
     "i18n": "npm run i18n:textdomain && npm run i18n:pot",
     "i18n:textdomain": "npx wpi18n addtextdomain --exclude=vendor,tests,node_modules",
     "i18n:pot": "npx wpi18n makepot --domain-path=languages",
-    "package": "./bin/build-zip.sh",
+    "plugin-zip": "./bin/build-zip.sh",
     "prepare": "husky install"
   }
 }
