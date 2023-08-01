@@ -58,19 +58,32 @@
 
 			&-date {
 				font-weight: 700;
+
+				+ * {
+					display: flex;
+					flex-wrap: wrap;
+					align-items: center;
+					gap: 8px;
+				}
 			}
 
 			&-actions {
 				margin: 1em 0 0;
 				display: flex;
-				flex-wrap: wrap;
-				align-items: center;
-				gap: 40px;
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 0 40px;
 
 				.button {
 					margin: 0 0.5em 0.5em 0;
 					display: inline-block;
 				}
+			}
+
+			.state-cart-info-action {
+				white-space: nowrap;
+				display: inline-block;
+				margin: 0;
 			}
 		}
 	}
@@ -113,6 +126,12 @@
 		flex-wrap: wrap;
 		align-items: center;
 		gap: 8px 20px;
+	}
+
+	&-calendar-title {
+		color: var(--wp--preset--color--blue);
+		font-weight: 500;
+		margin: 0;
 	}
 
 	&-calendar {

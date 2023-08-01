@@ -184,28 +184,30 @@ function wp_zoom_get_occurrences( $type = 'webinars', $show_past = false ) {
 	$occurrences = array();
 	$objects     = call_user_func( array( $wp_zoom, 'get_' . $type ) );
 
-	foreach ( $objects[ $type ] as $object ) {
-		// phpcs:ignore WordPress.PHP.StrictComparisons
-		if ( $object['type'] == 8 || $object['type'] == 9 ) {
-			$object = call_user_func_array( array( $wp_zoom, 'get_' . substr( $type, 0, -1 ) ), array( $object['id'] ) );
-		}
-
-		if ( ! isset( $object['start_time'] ) && ! isset( $object['occurrences'] ) ) {
-			continue;
-		}
-
-		if ( isset( $object['occurrences'] ) ) {
-			foreach ( $object['occurrences'] as $occurrence ) {
-				if ( $occurrence['status'] !== 'available' ) {
-					continue;
-				}
-
-				$occurrence = array_merge( $object, $occurrence );
-
-				$occurrences[] = $occurrence;
+	if ( ! empty( $objects[ $type ] ) ) {
+		foreach ( $objects[ $type ] as $object ) {
+			// phpcs:ignore WordPress.PHP.StrictComparisons
+			if ( $object['type'] == 8 || $object['type'] == 9 ) {
+				$object = call_user_func_array( array( $wp_zoom, 'get_' . substr( $type, 0, -1 ) ), array( $object['id'] ) );
 			}
-		} else {
-			$occurrences[] = $object;
+
+			if ( ! isset( $object['start_time'] ) && ! isset( $object['occurrences'] ) ) {
+				continue;
+			}
+
+			if ( isset( $object['occurrences'] ) ) {
+				foreach ( $object['occurrences'] as $occurrence ) {
+					if ( $occurrence['status'] !== 'available' ) {
+						continue;
+					}
+
+					$occurrence = array_merge( $object, $occurrence );
+
+					$occurrences[] = $occurrence;
+				}
+			} else {
+				$occurrences[] = $object;
+			}
 		}
 	}
 
