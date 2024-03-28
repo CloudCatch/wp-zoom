@@ -152,9 +152,15 @@ function wp_zoom_get_webinars( $post = null ) {
 			array_walk(
 				$webinars,
 				function( &$webinar ) use ( $wp_zoom ) {
-					$_webinar = $wp_zoom->get_webinar( $webinar );
+					$webinar = trim( $webinar );
 
-					$webinar = isset( $_webinar['uuid'] ) ? $_webinar : null;
+					if ( ! empty( $webinar ) ) {
+						$_webinar = $wp_zoom->get_webinar( $webinar );
+
+						$webinar = isset( $_webinar['uuid'] ) ? $_webinar : null;
+					} else {
+						$webinar = null;
+					}
 				}
 			);
 		}

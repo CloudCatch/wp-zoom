@@ -58,15 +58,32 @@
 
 			&-date {
 				font-weight: 700;
+
+				+ * {
+					display: flex;
+					flex-wrap: wrap;
+					align-items: center;
+					gap: 8px;
+				}
 			}
 
 			&-actions {
 				margin: 1em 0 0;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 0 40px;
 
 				.button {
 					margin: 0 0.5em 0.5em 0;
 					display: inline-block;
 				}
+			}
+
+			.state-cart-info-action {
+				white-space: nowrap;
+				display: inline-block;
+				margin: 0;
 			}
 		}
 	}
@@ -101,6 +118,59 @@
 					background: #f5f5f5;
 				}
 			}
+		}
+	}
+
+	&-calendar-links {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 8px 20px;
+	}
+
+	&-calendar-title {
+		color: var(--wp--preset--color--blue);
+		font-weight: 500;
+		margin: 0;
+	}
+
+	&-calendar {
+		display: inline-flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		font-size: 14px;
+		font-weight: 500;
+		border-radius: 10px;
+		padding: 1em;
+
+		&:hover {
+			background-color: #f5f5f5;
+		}
+
+		&:before {
+			content: '';
+			display: inline-block;
+			background-size: contain;
+			background-position: center;
+			width: 20px;
+			height: 20px;
+		}
+
+		&.google:before {
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' width='48px' height='48px'%3E%3Crect width='22' height='22' x='13' y='13' fill='%23fff'/%3E%3Cpolygon fill='%231e88e5' points='25.68,20.92 26.688,22.36 28.272,21.208 28.272,29.56 30,29.56 30,18.616 28.56,18.616'/%3E%3Cpath fill='%231e88e5' d='M22.943,23.745c0.625-0.574,1.013-1.37,1.013-2.249c0-1.747-1.533-3.168-3.417-3.168 c-1.602,0-2.972,1.009-3.33,2.453l1.657,0.421c0.165-0.664,0.868-1.146,1.673-1.146c0.942,0,1.709,0.646,1.709,1.44 c0,0.794-0.767,1.44-1.709,1.44h-0.997v1.728h0.997c1.081,0,1.993,0.751,1.993,1.64c0,0.904-0.866,1.64-1.931,1.64 c-0.962,0-1.784-0.61-1.914-1.418L17,26.802c0.262,1.636,1.81,2.87,3.6,2.87c2.007,0,3.64-1.511,3.64-3.368 C24.24,25.281,23.736,24.363,22.943,23.745z'/%3E%3Cpolygon fill='%23fbc02d' points='34,42 14,42 13,38 14,34 34,34 35,38'/%3E%3Cpolygon fill='%234caf50' points='38,35 42,34 42,14 38,13 34,14 34,34'/%3E%3Cpath fill='%231e88e5' d='M34,14l1-4l-1-4H9C7.343,6,6,7.343,6,9v25l4,1l4-1V14H34z'/%3E%3Cpolygon fill='%23e53935' points='34,34 34,42 42,34'/%3E%3Cpath fill='%231565c0' d='M39,6h-5v8h8V9C42,7.343,40.657,6,39,6z'/%3E%3Cpath fill='%231565c0' d='M9,42h5v-8H6v5C6,40.657,7.343,42,9,42z'/%3E%3C/svg%3E");
+		}
+
+		&.outlook:before {
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' width='48px' height='48px'%3E%3Cpath fill='%2303A9F4' d='M21,31c0,1.104,0.896,2,2,2h17c1.104,0,2-0.896,2-2V16c0-1.104-0.896-2-2-2H23c-1.104,0-2,0.896-2,2V31z'/%3E%3Cpath fill='%23B3E5FC' d='M42,16.975V16c0-0.428-0.137-0.823-0.367-1.148l-11.264,6.932l-7.542-4.656L22.125,19l8.459,5L42,16.975z'/%3E%3Cpath fill='%230277BD' d='M27 41.46L6 37.46 6 9.46 27 5.46z'/%3E%3Cpath fill='%23FFF' d='M21.216,18.311c-1.098-1.275-2.546-1.913-4.328-1.913c-1.892,0-3.408,0.669-4.554,2.003c-1.144,1.337-1.719,3.088-1.719,5.246c0,2.045,0.564,3.714,1.69,4.986c1.126,1.273,2.592,1.91,4.378,1.91c1.84,0,3.331-0.652,4.474-1.975c1.143-1.313,1.712-3.043,1.712-5.199C22.869,21.281,22.318,19.595,21.216,18.311z M19.049,26.735c-0.568,0.769-1.339,1.152-2.313,1.152c-0.939,0-1.699-0.394-2.285-1.187c-0.581-0.785-0.87-1.861-0.87-3.211c0-1.336,0.289-2.414,0.87-3.225c0.586-0.81,1.368-1.211,2.355-1.211c0.962,0,1.718,0.393,2.267,1.178c0.555,0.795,0.833,1.895,0.833,3.31C19.907,24.906,19.618,25.968,19.049,26.735z'/%3E%3C/svg%3E");
+		}
+
+		&.office:before {
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' width='48px' height='48px'%3E%3Cpath fill='%23e64a19' d='M7 12L29 4 41 7 41 41 29 44 7 36 29 39 29 10 15 13 15 33 7 36z'/%3E%3C/svg%3E");
+		}
+
+		&.yahoo:before {
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='304' height='304' viewBox='0 0 80.433 80.433'%3E%3Cg fill='%235f01d1'%3E%3Cg transform='translate(76.805 44.743)'%3E%3Ccircle cx='-24.212' cy='8.425' r='9.535'/%3E%3Cpath d='M-11.543-4.614H-28.71l15.236-36.6H3.628z'/%3E%3C/g%3E%3Cpath d='M0 21.391h15.741l9.166 23.45 9.284-23.45h15.327L26.44 76.904H11.016l6.317-14.71z'/%3E%3C/g%3E%3C/svg%3E");
 		}
 	}
 }
