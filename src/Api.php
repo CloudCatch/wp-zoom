@@ -75,8 +75,6 @@ class Api {
 			$access_token->jsonSerialize()
 		);
 
-		Cache::delete_all();
-
 		return $access_token;
 	}
 
@@ -144,8 +142,6 @@ class Api {
 			delete_option( 'wp_zoom_oauth_tokens' );
 			delete_option( 'wp_zoom_user_id' );
 
-			Cache::delete_all();
-
 			Log::write(
 				$e->getMessage(),
 				'error',
@@ -172,6 +168,7 @@ class Api {
 					'method'    => $method,
 					'body'      => $body,
 					'headers'   => $headers,
+					'referer'   => esc_url( 'http' . (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ),
 				)
 			);
 		}

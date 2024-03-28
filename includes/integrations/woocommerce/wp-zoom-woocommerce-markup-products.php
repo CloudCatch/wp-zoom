@@ -654,7 +654,7 @@ function wp_zoom_woocommerce_list_after_info( $args ) {
 		printf( '<p class="wp-zoom-list-item--info-excerpt">%s</p>', $product->get_short_description() );
 	}
 }
-// add_action( 'wp_zoom_list_after_info', 'wp_zoom_woocommerce_list_after_info' );
+add_action( 'wp_zoom_list_after_info', 'wp_zoom_woocommerce_list_after_info' );
 
 /**
  * Display buttons to register or view more details
@@ -665,7 +665,7 @@ function wp_zoom_woocommerce_list_after_info( $args ) {
 function wp_zoom_woocommerce_list_info_action( $args ) {
 	if ( $args['product'] ) {
 		printf(
-			'<a href="%s" class="button wp-zoom-list-item--info-actions-button add_to_cart_button wp-element-button">%s</a>',
+			'<a href="%s" class="button wp-zoom-list-item--info-actions-button add_to_cart_button">%s</a>',
 			esc_url(
 				add_query_arg(
 					array(
@@ -680,99 +680,6 @@ function wp_zoom_woocommerce_list_info_action( $args ) {
 	}
 }
 add_action( 'wp_zoom_list_after_info_actions', 'wp_zoom_woocommerce_list_info_action' );
-
-/**
- * Display calendar icons
- *
- * @param array $args Shortcode data and arguments.
- * @return void
- */
-function wp_zoom_woocommerce_calendar_icons( $args ) {
-
-	if ( isset( $args['start_time'], $args['duration'], $args['topic'], $args['product'] ) ) {
-		$purchase_url = esc_url(
-			add_query_arg(
-				array(
-					'add-to-cart'   => $args['product'],
-					'occurrence_id' => $args['occurrence_id'] ?? null,
-				),
-				get_permalink( $args['product'] )
-			)
-		);
-
-		$real_start_time = DateTime::createFromFormat( DateTime::ATOM, $args['start_time'] );
-		$real_start_time->setTimezone(new DateTimeZone('America/New_York'));
-
-		$start_time = DateTime::createFromFormat( DateTime::ATOM, $args['start_time'] );
-		$start_time->sub( new DateInterval( 'PT24H' ) );
-
-		if ( ! $start_time ) {
-			return;
-		}
-
-		$end_time = clone $start_time;
-		$end_time->add( new DateInterval( 'PT24H' ) );
-
-		if ( ! $end_time ) {
-			return;
-		}
-
-		// $title = sprintf( __( 'Webinar: %s', 'wp-zoom' ), $args['topic'] );
-		$title = 'Reminder: Register for Upcoming Webinar for CE Credits';
-		$credits = '';
-
-		if ( function_exists( 'betterce_get_product_course_hours' ) ) {
-			$credits = betterce_get_product_course_hours( (int) $args['product'] );
-		}
-
-		$intro = sprintf( esc_html__( 'BetterCE is offering %s tomorrow at %s EST for %s credits. Click on the link below to purchase and enroll:', 'wp-zoom' ), esc_html( $args['topic'] ), $real_start_time->format( 'g:ia' ), $credits ?: '' );
-
-		$google = sprintf(
-			'https://calendar.google.com/calendar/render?action=TEMPLATE&dates=%s/%s&details=%s&text=%s',
-			$start_time->format( 'Ymd' ),
-			$end_time->format( 'Ymd' ),
-			rawurlencode( $intro . '<br><br>' . sprintf( '<a href="%1$s">%2$s</a><br><br>%1$s', $purchase_url, esc_html__( 'Register for Webinar', 'wp-zoom' ) ) ),
-			$title,
-		);
-
-		$outlook = sprintf(
-			'https://outlook.live.com/calendar/0/action/compose?allday=true&startdt=%s&enddt=%s&subject=%s&body=%s&location=&path=/calendar/action/compose&rru=addevent',
-			rawurlencode( $start_time->format( 'Y-m-d\TH:i:s' ) . '+00:00' ),
-			rawurlencode( $end_time->format( 'Y-m-d\TH:i:s' ) . '+00:00' ),
-			$title,
-			rawurlencode( $intro . '<br><br>' . sprintf( '<a href="%1$s">%2$s</a><br><br>%1$s', $purchase_url, esc_html__( 'Register for Webinar', 'wp-zoom' ) ) ),
-		);
-
-		$office365 = sprintf(
-			'https://outlook.office.com/calendar/action/compose?allday=true&startdt=%s&enddt=%s&subject=%s&body=%s&location=&path=/calendar/action/compose&rru=addevent',
-			rawurlencode( $start_time->format( 'Y-m-d\TH:i:s' ) . '+00:00' ),
-			rawurlencode( $end_time->format( 'Y-m-d\TH:i:s' ) . '+00:00' ),
-			$title,
-			rawurlencode( $intro . '<br><br>' . sprintf( '<a href="%1$s">%2$s</a><br><br>%1$s', $purchase_url, esc_html__( 'Register for Webinar', 'wp-zoom' ) ) ),
-		);
-
-		$yahoo = sprintf(
-			'https://calendar.yahoo.com/?dur=allday&st=%s&et=%s&title=%s&desc=%s&v=60',
-			$start_time->format( 'Ymd' ),
-			$end_time->format( 'Ymd' ),
-			$title,
-			rawurlencode( $intro . "%0A%0A" . esc_html__( 'Register for Webinar', 'wp-zoom' ) . '%0A%0A' . get_permalink( $args['product'] ) )
-		);
-
-		?>
-
-		<div class="wp-zoom-calendar-links">
-			<h5 class="wp-zoom-calendar-title"><?php esc_html_e( 'Set Reminder to Register', 'wp-zoom' ); ?>: </h5>
-			<a href="<?php echo esc_url( $google ); ?>" target="_blank" rel="nofollow" class="wp-zoom-calendar google"><?php esc_html_e( 'Google Calendar', 'wp-zoom' ); ?></a>
-			<a href="<?php echo esc_url( $outlook ); ?>" target="_blank" rel="nofollow" class="wp-zoom-calendar outlook"><?php esc_html_e( 'Microsoft Outlook', 'wp-zoom' ); ?></a>
-			<a href="<?php echo esc_url( $office365 ); ?>" target="_blank" rel="nofollow" class="wp-zoom-calendar office"><?php esc_html_e( 'Office 365', 'wp-zoom' ); ?></a>
-			<a href="<?php echo esc_url( $yahoo ); ?>" target="_blank" rel="nofollow" class="wp-zoom-calendar yahoo"><?php esc_html_e( 'Yahoo! Calendar', 'wp-zoom' ); ?></a>
-		</div>
-
-		<?php
-	}
-}
-add_action( 'wp_zoom_list_after_info_actions', 'wp_zoom_woocommerce_calendar_icons' );
 
 /**
  * Filter list occurrences by product category and populate data products

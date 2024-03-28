@@ -18,6 +18,7 @@ use League\OAuth2\Client\Token\AccessToken;
 use Psr\Http\Message\ResponseInterface;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use SeattleWebCo\WPZoom\Exception\ApiRequestException;
+use SeattleWebCo\WPZoom\Exception\InvalidExpiredEntityException;
 use SeattleWebCo\WPZoom\Exception\InvalidTokenException;
 
 /**
@@ -108,6 +109,16 @@ class Zoom extends AbstractProvider {
 					sprintf(
 						/* translators: 1: Response message */
 						__( 'Unable to retrieve access token from server: %s', 'wp-zoom' ),
+						$data['message']
+					)
+				);
+			}
+
+			if ( isset( $data['code'] ) && $data['code'] === 3001 ) {
+				throw new InvalidExpiredEntityException(
+					sprintf(
+						/* translators: 1: Response message */
+						__( 'Invalid or expired Zoom entity: %s', 'wp-zoom' ),
 						$data['message']
 					)
 				);
