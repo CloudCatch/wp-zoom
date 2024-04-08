@@ -1,6 +1,12 @@
 ( function ( $ ) {
 
-	var $form = $( '.variations_form' ).wc_variation_form();
+	var $form = $( '.variations_form' );
+
+	if ( ! $form || ! $form.length ) {
+		return;
+	}
+
+	$form = $form.wc_variation_form();
 
 	$form.on( 'found_variation reset_data', function ( event, found_variation ) {
 		var webinars = typeof found_variation !== 'undefined' ? found_variation.webinars : [];
@@ -8,7 +14,6 @@
 		$( this ).find( '.wp-zoom-variation-webinar' ).remove();
 
 		webinars.map( ( webinar ) => {
-			console.log( event );
 			$form.block( {message: null, overlayCSS: {background: '#fff', opacity: 0.6}} );
 
 			$.ajax( {
