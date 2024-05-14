@@ -6,7 +6,9 @@
 		return;
 	}
 
-	$form = $form.wc_variation_form();
+	if ( typeof $form.wc_variation_form === 'function' ) {
+		$form = $form.wc_variation_form();
+	}
 
 	$form.on( 'found_variation reset_data', function ( event, found_variation ) {
 		var webinars = typeof found_variation !== 'undefined' ? found_variation.webinars : [];
