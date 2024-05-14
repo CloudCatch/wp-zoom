@@ -356,6 +356,11 @@ function wp_zoom_payment_complete( $order_id, $from, $to, $order ) {
 				/* translators: 1: Webinar topic */
 				$order->add_order_note( sprintf( esc_html__( 'An error occurred while registering customer for %1$s', 'wp-zoom' ), $topic ) );
 
+				// Send administator an email.
+				$subject = sprintf( esc_html__( 'Error registering user for webinar %s', 'wp-zoom' ), $topic );
+				$message = sprintf( esc_html__( 'An error occurred while registering user for webinar %s. Order ID: #%s', 'wp-zoom' ), $topic, $order_id );
+
+				wp_mail( get_option( 'admin_email' ), $subject, $message, array( 'Content-Type: text/html; charset=UTF-8' ) );
 			}
 		}
 	}
