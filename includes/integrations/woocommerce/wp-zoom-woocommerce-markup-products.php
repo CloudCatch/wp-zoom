@@ -325,7 +325,7 @@ function wp_zoom_payment_complete( $order_id, $from, $to, $order ) {
 				);
 			}
 
-			$registrant_data = array(
+			$registrant_data = apply_filters( 'wp_zoom_webinar_registrant_data', array(
 				'email'            => $order->get_billing_email(),
 				'first_name'       => $order->get_billing_first_name(),
 				'last_name'        => $order->get_billing_last_name(),
@@ -337,7 +337,7 @@ function wp_zoom_payment_complete( $order_id, $from, $to, $order ) {
 				'phone'            => $order->get_billing_phone(),
 				'org'              => $order->get_billing_company(),
 				'custom_questions' => $custom_questions,
-			);
+			), $order, $custom_questions, $webinar_id, $occurrence_id );
 
 			$registration = $wp_zoom->add_webinar_registrant( $webinar_id, $registrant_data, $occurrence_id );
 
