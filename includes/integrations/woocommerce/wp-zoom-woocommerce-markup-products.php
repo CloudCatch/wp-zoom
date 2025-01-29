@@ -158,6 +158,11 @@ function wp_zoom_add_to_cart_validation( $passed, $product_id, $quantity, $varia
 		}
 	}
 
+	if ( ! $passed ) {
+		wp_safe_redirect( get_permalink( $product_id ) );
+		exit;
+	}
+
 	return $passed;
 }
 add_filter( 'woocommerce_add_to_cart_validation', 'wp_zoom_add_to_cart_validation', 10, 4 );
