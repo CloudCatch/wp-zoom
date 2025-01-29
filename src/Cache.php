@@ -44,7 +44,7 @@ class Cache {
 	 * @param integer $expires When to expire cached value.
 	 * @return void
 	 */
-	public static function set( $key, $value, $group = '', $expires = 300 ) {
+	public static function set( $key, $value, $group = '', $expires = 43200 ) {
 		if ( null === $value ) {
 			return;
 		}

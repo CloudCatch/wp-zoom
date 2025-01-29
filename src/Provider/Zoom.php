@@ -18,6 +18,7 @@ use League\OAuth2\Client\Token\AccessToken;
 use Psr\Http\Message\ResponseInterface;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use SeattleWebCo\WPZoom\Exception\ApiRequestException;
+use SeattleWebCo\WPZoom\Exception\InvalidExpiredEntityException;
 use SeattleWebCo\WPZoom\Exception\InvalidTokenException;
 
 /**
@@ -113,11 +114,22 @@ class Zoom extends AbstractProvider {
 				);
 			}
 
+			if ( isset( $data['code'] ) && $data['code'] === 3001 ) {
+				throw new InvalidExpiredEntityException(
+					sprintf(
+						/* translators: 1: Response message */
+						__( 'Invalid or expired Zoom entity: %s', 'wp-zoom' ),
+						$data['message']
+					)
+				);
+			}
+
 			throw new ApiRequestException(
 				sprintf(
 					/* translators: 1: Response message */
-					__( 'Error recieved from Zoom API: %1$s', 'wp-zoom' ),
-					wp_json_encode( $data )
+					__( 'Error recieved from Zoom API: %1$s | %2$s', 'wp-zoom' ),
+					wp_json_encode( $data ),
+					wp_json_encode( $response )
 				)
 			);
 		}

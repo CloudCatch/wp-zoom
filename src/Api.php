@@ -125,13 +125,22 @@ class Api {
 
 				$response = $this->provider->getParsedResponse( $request );
 
+				Log::write(
+					esc_html__( 'API Request Succeeded.', 'wp-zoom' ),
+					'debug',
+					array(
+						'uri'       => $uri,
+						'method'    => $method,
+						'body'      => $body,
+						'headers'   => $headers,
+					)
+				);
+
 				return $response;
 			}
 		} catch ( InvalidTokenException $e ) {
 			delete_option( 'wp_zoom_oauth_tokens' );
 			delete_option( 'wp_zoom_user_id' );
-
-			Cache::delete_all();
 
 			Log::write(
 				$e->getMessage(),
@@ -159,6 +168,7 @@ class Api {
 					'method'    => $method,
 					'body'      => $body,
 					'headers'   => $headers,
+					'referer'   => esc_url( 'http' . (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 's' : '') . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ),
 				)
 			);
 		}

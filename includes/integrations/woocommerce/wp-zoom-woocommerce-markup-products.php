@@ -158,6 +158,11 @@ function wp_zoom_add_to_cart_validation( $passed, $product_id, $quantity, $varia
 		}
 	}
 
+	if ( ! $passed ) {
+		wp_safe_redirect( get_permalink( $product_id ) );
+		exit;
+	}
+
 	return $passed;
 }
 add_filter( 'woocommerce_add_to_cart_validation', 'wp_zoom_add_to_cart_validation', 10, 4 );
@@ -325,7 +330,7 @@ function wp_zoom_payment_complete( $order_id, $from, $to, $order ) {
 				);
 			}
 
-			$registrant_data = array(
+			$registrant_data = apply_filters( 'wp_zoom_webinar_registrant_data', array(
 				'email'            => $order->get_billing_email(),
 				'first_name'       => $order->get_billing_first_name(),
 				'last_name'        => $order->get_billing_last_name(),
@@ -337,7 +342,7 @@ function wp_zoom_payment_complete( $order_id, $from, $to, $order ) {
 				'phone'            => $order->get_billing_phone(),
 				'org'              => $order->get_billing_company(),
 				'custom_questions' => $custom_questions,
-			);
+			), $order, $custom_questions, $webinar_id, $occurrence_id );
 
 			$registration = $wp_zoom->add_webinar_registrant( $webinar_id, $registrant_data, $occurrence_id );
 
@@ -356,6 +361,11 @@ function wp_zoom_payment_complete( $order_id, $from, $to, $order ) {
 				/* translators: 1: Webinar topic */
 				$order->add_order_note( sprintf( esc_html__( 'An error occurred while registering customer for %1$s', 'wp-zoom' ), $topic ) );
 
+				// Send administator an email.
+				$subject = sprintf( esc_html__( 'Error registering user for webinar %s', 'wp-zoom' ), $topic );
+				$message = sprintf( esc_html__( 'An error occurred while registering user for webinar %s. Order ID: #%s', 'wp-zoom' ), $topic, $order_id );
+
+				wp_mail( get_option( 'admin_email' ), $subject, $message, array( 'Content-Type: text/html; charset=UTF-8' ) );
 			}
 		}
 	}
