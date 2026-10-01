@@ -5,6 +5,10 @@
  * @package SeattleWebCo\WPZoom
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 ?>
 
 <div class="wp-zoom-list">

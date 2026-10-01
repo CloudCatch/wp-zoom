@@ -7,6 +7,10 @@
 
 namespace SeattleWebCo\WPZoom\Exception;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Thrown when an invalid token response is recieved from server
  */

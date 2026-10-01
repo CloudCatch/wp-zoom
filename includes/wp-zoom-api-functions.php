@@ -5,6 +5,10 @@
  * @package SeattleWebCo\WPZoom
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Notify administrator when the Zoom API is disconnected
  *

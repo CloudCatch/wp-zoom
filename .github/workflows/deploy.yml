@@ -10,20 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Run composer install
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install WP-CLI
         run: |
-          composer clear-cache
-          composer install --no-dev --prefer-dist
+          curl -fsSL -o /tmp/wp-cli.phar https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          chmod +x /tmp/wp-cli.phar
+          sudo mv /tmp/wp-cli.phar /usr/local/bin/wp
 
       - name: Install npm packages
-        run: |
-          npm ci
+        run: npm ci
 
       - name: Build
         run: |
-          npm install
           npm run build
           npm run i18n
 
@@ -33,9 +37,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Stamp release version
+        if: steps.semantic.outputs.new-release-published == 'true'
+        run: |
+          sed -i "s/0.0.0-development/${{ steps.semantic.outputs.release-version }}/g" wp-zoom.php readme.txt
+
       - name: WordPress Plugin Deploy
         if: steps.semantic.outputs.new-release-published == 'true'
-        uses: 10up/action-wordpress-plugin-deploy@1.5.0
+        uses: 10up/action-wordpress-plugin-deploy@stable
         with:
           generate-zip: true
         env:
@@ -43,6 +52,7 @@ jobs:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SLUG: wp-zoom
           VERSION: ${{ steps.semantic.outputs.release-version }}
+
       - name: Upload release asset
         if: |
           steps.semantic.outputs.new-release-published == 'true' &&

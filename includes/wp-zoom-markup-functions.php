@@ -5,6 +5,10 @@
  * @package SeattleWebCo\WPZoom
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Load template from plugin or theme overrides
  *
@@ -112,6 +116,15 @@ function wp_zoom_render_field_select_webinar_occurrence( array $webinar, array $
 	);
 
 	$occurrences = $webinar['occurrences'] ?? array();
+
+	if ( 'yes' === wp_zoom_get_setting( 'hide_webinar_occurrences_disabled' ) ) {
+		$occurrences = array_filter(
+			$occurrences,
+			function( $occurrence ) {
+				return isset( $occurrence['status'] ) && 'available' === $occurrence['status'];
+			}
+		);
+	}
 	?>
 
 	<?php if ( ! empty( $occurrences ) ) { ?>

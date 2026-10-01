@@ -5,6 +5,10 @@
  * @package SeattleWebCo\WPZoom
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Test helper functions
  */
@@ -23,13 +27,11 @@ class TestHelperFunctions extends WP_UnitTestCase {
     }
 
     function test_wp_zoom_get_webinars() {
-        $provider = $this->getMockBuilder('\League\OAuth2\Client\Provider\GenericProvider')
-			->setConstructorArgs(array( array(
-				'urlAuthorize' => 'https://example.com',
-				'urlAccessToken' => 'https://example.com',
-				'urlResourceOwnerDetails' => 'https://example.com'
-			)))
-			->getMock();
+        $provider = new \SeattleWebCo\WPZoom\Provider\Zoom(
+			array(
+				'redirectUri' => 'https://example.com',
+			)
+		);
 		
 		
 		$GLOBALS['wp_zoom'] = $this->getMockBuilder('\SeattleWebCo\WPZoom\API')

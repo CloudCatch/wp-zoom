@@ -7,6 +7,10 @@
 
 namespace SeattleWebCo\WPZoom;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Cache data for current request and as a transient
  */

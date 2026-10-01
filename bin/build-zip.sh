@@ -9,18 +9,19 @@ echo "Generating build directory..."
 rm -rf "$BUILD_PATH"
 mkdir -p "$DEST_PATH"
 
-echo "Installing PHP and JS dependencies..."
-npm ci --no-optional
-composer install || exit "$?"
+echo "Installing JS dependencies..."
+npm ci || exit "$?"
 echo "Running JS Build..."
 npm run build || exit "$?"
 echo "Generating translations..."
 npm run i18n || exit "$?"
-echo "Cleaning up PHP dependencies..."
-composer install --no-dev || exit "$?"
 
 echo "Syncing files..."
-rsync -rc --exclude-from="$PROJECT_PATH/.distignore" "$PROJECT_PATH/" "$DEST_PATH/" --delete --delete-excluded
+# openrsync treats a trailing CR as part of the pattern, so a CRLF .distignore excludes nothing.
+DISTIGNORE=$(mktemp)
+sed 's/\r$//' "$PROJECT_PATH/.distignore" > "$DISTIGNORE"
+rsync -rc --exclude-from="$DISTIGNORE" "$PROJECT_PATH/" "$DEST_PATH/" --delete --delete-excluded
+rm -f "$DISTIGNORE"
 
 echo "Generating zip file..."
 cd "$BUILD_PATH" || exit

@@ -5,6 +5,10 @@
  * @package SeattleWebCo\WPZoom
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 ?>
 
 <div class="wp-zoom-list-item" data-id="<?php echo esc_attr( $args['id'] ); ?>">

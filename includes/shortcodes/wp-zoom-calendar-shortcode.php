@@ -5,6 +5,10 @@
  * @package SeattleWebCo\WPZoom
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Render the calendar.
  *
@@ -22,6 +26,8 @@ function wp_zoom_calendar_shortcode( $atts, $content = '' ) {
 		),
 		$atts
 	);
+
+	wp_zoom_enqueue_calendar_script();
 
 	return sprintf( '<div id="wp-zoom-calendar" data-args="%s"></div>', esc_attr( wp_json_encode( $atts ) ) );
 }

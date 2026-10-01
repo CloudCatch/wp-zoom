@@ -5,6 +5,10 @@
  * @package SeattleWebCo\WPZoom
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use SeattleWebCo\WPZoom\Cache;
 
 /**
@@ -145,8 +149,10 @@ function wp_zoom_get_webinars( $post = null ) {
 		$webinars = get_post_meta( $post->ID, '_wp_zoom_webinars', true );
 
 		if ( ! is_array( $webinars ) ) {
-			$webinars = (array) $webinars;
+			$webinars = '' === $webinars || null === $webinars ? array() : (array) $webinars;
 		}
+
+		$webinars = array_filter( $webinars );
 
 		if ( ! empty( $webinars ) ) {
 			array_walk(
@@ -177,6 +183,10 @@ function wp_zoom_get_occurrences( $type = 'webinars', $show_past = false ) {
 
 	$occurrences = array();
 	$objects     = call_user_func( array( $wp_zoom, 'get_' . $type ) );
+
+	if ( empty( $objects[ $type ] ) || ! is_array( $objects[ $type ] ) ) {
+		return array();
+	}
 
 	foreach ( $objects[ $type ] as $object ) {
 		// phpcs:ignore WordPress.PHP.StrictComparisons
@@ -288,6 +298,48 @@ function wp_zoom_get_available_webinar_occurrence( array $webinar, string $occur
  */
 function wp_zoom_occurrence_available( array $webinar, string $occurrence_id ) {
 	return (bool) wp_zoom_get_available_webinar_occurrence( $webinar, $occurrence_id );
+}
+
+/**
+ * Verify a request nonce after unslashing and sanitizing it.
+ *
+ * wp_verify_nonce() is pluggable, so the nonce must be sanitized first.
+ *
+ * @param int|string $action Nonce action. Default -1 matches wp_create_nonce().
+ * @return bool
+ */
+function wp_zoom_verify_request_nonce( $action = -1 ) {
+	$nonce = '';
+
+	if ( isset( $_REQUEST['_wpnonce'] ) ) {
+		$nonce = sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) );
+	}
+
+	return (bool) wp_verify_nonce( $nonce, $action );
+}
+
+/**
+ * Confirm the OAuth state matches the value stored when this admin started authorization.
+ *
+ * @return bool
+ */
+function wp_zoom_verify_oauth_state() {
+	$user_id = get_current_user_id();
+
+	if ( ! $user_id ) {
+		return false;
+	}
+
+	$stored = get_user_meta( $user_id, 'wp_zoom_oauth_state', true );
+	$state  = isset( $_GET['state'] ) ? sanitize_text_field( wp_unslash( $_GET['state'] ) ) : '';
+
+	if ( ! is_string( $stored ) || '' === $stored || '' === $state || ! hash_equals( $stored, $state ) ) {
+		return false;
+	}
+
+	delete_user_meta( $user_id, 'wp_zoom_oauth_state' );
+
+	return true;
 }
 
 /**

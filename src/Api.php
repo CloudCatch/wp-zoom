@@ -7,9 +7,11 @@
 
 namespace SeattleWebCo\WPZoom;
 
-use League\OAuth2\Client\Provider\AbstractProvider;
-use League\OAuth2\Client\Token\AccessToken;
 use SeattleWebCo\WPZoom\Exception\InvalidTokenException;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Api class.
@@ -31,27 +33,58 @@ class Api {
 	public $user_id;
 
 	/**
-	 * OAuth 2 provider
+	 * OAuth provider.
 	 *
-	 * @var AbstractProvider
+	 * @var \SeattleWebCo\WPZoom\Provider\Zoom
 	 */
 	public $provider;
 
 	/**
 	 * Init
 	 *
-	 * @param AbstractProvider $provider OAuth 2 provider.
+	 * @param \SeattleWebCo\WPZoom\Provider\Zoom $provider OAuth provider.
 	 */
-	public function __construct( AbstractProvider $provider ) {
+	public function __construct( $provider ) {
 		$this->provider = $provider;
 
 		$this->user_id = get_option( 'wp_zoom_user_id', null );
+
+		$tokens = get_option( 'wp_zoom_oauth_tokens', array() );
+		if ( ! empty( $tokens['api_url'] ) ) {
+			$this->apply_api_url( $tokens['api_url'] );
+		}
+	}
+
+	/**
+	 * Point API calls at the cluster host Zoom returned with the token.
+	 *
+	 * @param string $api_url Host such as https://api-us.zoom.us.
+	 * @return void
+	 */
+	public function apply_api_url( $api_url ) {
+		$api_url = untrailingslashit( (string) $api_url );
+		$parts   = wp_parse_url( $api_url );
+
+		if ( empty( $parts['scheme'] ) || 'https' !== $parts['scheme'] || empty( $parts['host'] ) ) {
+			return;
+		}
+
+		if ( ! preg_match( '/(^|\.)zoom\.us$/', $parts['host'] ) ) {
+			return;
+		}
+
+		if ( isset( $parts['path'] ) && '/v2' === untrailingslashit( $parts['path'] ) ) {
+			$this->base_uri = $api_url;
+			return;
+		}
+
+		$this->base_uri = $api_url . '/v2';
 	}
 
 	/**
 	 * Update access token in database
 	 *
-	 * @param AccessToken|Array $access_token Access token data to save to database.
+	 * @param AccessToken|array $access_token Access token data to save to database.
 	 * @return AccessToken
 	 */
 	public function update_access_token( $access_token ) {
@@ -68,6 +101,10 @@ class Api {
 
 		if ( (string) $access_token === 'null' ) {
 			return $access_token;
+		}
+
+		if ( '' !== $access_token->api_url ) {
+			$this->apply_api_url( $access_token->api_url );
 		}
 
 		update_option(
@@ -137,10 +174,8 @@ class Api {
 				$e->getMessage(),
 				'error',
 				array(
-					'uri'       => $uri,
-					'method'    => $method,
-					'body'      => $body,
-					'headers'   => $headers,
+					'uri'    => $uri,
+					'method' => $method,
 				)
 			);
 
@@ -155,10 +190,8 @@ class Api {
 				$e->getMessage(),
 				'error',
 				array(
-					'uri'       => $uri,
-					'method'    => $method,
-					'body'      => $body,
-					'headers'   => $headers,
+					'uri'    => $uri,
+					'method' => $method,
 				)
 			);
 		}
@@ -183,6 +216,10 @@ class Api {
 	 * @return array
 	 */
 	public function get_webinar( string $webinar_id, bool $cached = true ) {
+		if ( '' === $webinar_id ) {
+			return array();
+		}
+
 		if ( $cached ) {
 			$cache = Cache::get( 'wp_zoom_webinar_' . $webinar_id );
 
@@ -273,7 +310,7 @@ class Api {
 	 * @param string $occurrence_id The webinar occurrence if applicable.
 	 * @return array
 	 */
-	public function add_webinar_registrant( string $webinar_id, array $registrant_data, string $occurrence_id = null ) {
+	public function add_webinar_registrant( string $webinar_id, array $registrant_data, $occurrence_id = null ) {
 		$response = $this->request(
 			add_query_arg( array( 'occurrence_ids' => $occurrence_id ), $this->base_uri . '/webinars/' . $webinar_id . '/registrants' ),
 			'POST',
@@ -294,6 +331,10 @@ class Api {
 	 * @return array
 	 */
 	public function get_meeting( string $meeting_id, bool $cached = true ) {
+		if ( '' === $meeting_id ) {
+			return array();
+		}
+
 		if ( $cached ) {
 			$cache = Cache::get( 'wp_zoom_meeting_' . $meeting_id );
 

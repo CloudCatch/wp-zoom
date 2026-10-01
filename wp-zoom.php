@@ -3,25 +3,46 @@
  * Plugin Name:     Zoom for WordPress
  * Description:     Simple Zoom integration with WordPress makes anything possible
  * Version:         0.0.0-development
- * Author:          Seattle Web Co.
- * Author URI:      https://seattlewebco.com
+ * Author:          CloudCatch LLC
+ * Author URI:      https://cloudcatch.io
  * Text Domain:     wp-zoom
  * Domain Path:     /languages/
- * Contributors:    seattlewebco, dkjensen
+ * Contributors:    cloudcatch, dkjensen
  * Requires PHP:    7.0.0
+ * License:         GPL-3.0
+ * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
  *
  * @package SeattleWebCo\WPZoom
  */
 
 namespace SeattleWebCo\WPZoom;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 define( 'WP_ZOOM_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WP_ZOOM_URL', plugin_dir_url( __FILE__ ) );
-define( 'WP_ZOOM_VER', function_exists( 'get_plugin_data' ) ? get_plugin_data( __FILE__ )['Version'] : '1.0.0' );
+define( 'WP_ZOOM_VER', function_exists( 'get_plugin_data' ) ? get_plugin_data( __FILE__, false, false )['Version'] : '1.0.0' );
 define( 'WP_ZOOM_DB_VER', '1.0.0' );
 define( 'WP_ZOOM_BASE', __FILE__ );
 
-require_once WP_ZOOM_DIR . 'vendor/autoload.php';
+spl_autoload_register(
+	function ( $class ) {
+		$prefix = 'SeattleWebCo\\WPZoom\\';
+
+		if ( 0 !== strpos( $class, $prefix ) ) {
+			return;
+		}
+
+		$relative = substr( $class, strlen( $prefix ) );
+		$file     = WP_ZOOM_DIR . 'src/' . str_replace( '\\', '/', $relative ) . '.php';
+
+		if ( is_readable( $file ) ) {
+			require $file;
+		}
+	}
+);
 
 require_once WP_ZOOM_DIR . 'includes/wp-zoom-enqueue-scripts.php';
 require_once WP_ZOOM_DIR . 'includes/wp-zoom-api-functions.php';

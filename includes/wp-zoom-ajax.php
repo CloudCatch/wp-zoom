@@ -5,6 +5,10 @@
  * @package SeattleWebCo\WPZoom
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Get all webinars
  *
@@ -13,8 +17,11 @@
 function wp_zoom_ajax_get_webinars() {
 	global $wp_zoom;
 
-    // phpcs:ignore
-	if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'] ?? '' ) ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( esc_html__( 'You do not have permission to do that.', 'wp-zoom' ) );
+	}
+
+	if ( ! wp_zoom_verify_request_nonce() ) {
 		wp_send_json_error( esc_html__( 'Invalid nonce', 'wp-zoom' ) );
 	}
 
@@ -32,8 +39,7 @@ add_action( 'wp_ajax_wp_zoom_get_webinars', 'wp_zoom_ajax_get_webinars' );
 function wp_zoom_ajax_get_calendar_webinars() {
 	global $wp_zoom;
 
-    // phpcs:ignore
-	if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'] ?? '' ) ) {
+	if ( ! wp_zoom_verify_request_nonce() ) {
 		wp_send_json_error( esc_html__( 'Invalid nonce', 'wp-zoom' ) );
 	}
 
@@ -81,15 +87,18 @@ add_action( 'wp_ajax_wp_zoom_get_calendar_webinars', 'wp_zoom_ajax_get_calendar_
  * @return void
  */
 function wp_zoom_ajax_get_purchase_url_products() {
-	// phpcs:ignore
-	if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'] ?? '' ) ) {
+	if ( ! current_user_can( 'edit_products' ) ) {
+		wp_send_json_error( esc_html__( 'You do not have permission to do that.', 'wp-zoom' ) );
+	}
+
+	if ( ! wp_zoom_verify_request_nonce() ) {
 		wp_send_json_error( esc_html__( 'Invalid nonce', 'wp-zoom' ) );
 	}
 
 	$response         = '';
 	$grouped_products = array();
-	$webinars         = array_map( 'intval', $_REQUEST['webinars'] ?? array() );
-	$current_post     = intval( $_REQUEST['current_post'] ?? 0 );
+	$webinars         = isset( $_REQUEST['webinars'] ) ? array_map( 'absint', (array) wp_unslash( $_REQUEST['webinars'] ) ) : array();
+	$current_post     = isset( $_REQUEST['current_post'] ) ? absint( wp_unslash( $_REQUEST['current_post'] ) ) : 0;
 
 	foreach ( $webinars as $webinar ) {
 		$grouped_products = array_merge( $grouped_products, (array) wp_zoom_get_purchase_products( $webinar ) );

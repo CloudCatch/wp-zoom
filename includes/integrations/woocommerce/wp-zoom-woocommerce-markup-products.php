@@ -5,6 +5,10 @@
  * @package SeattleWebCo\WPZoom
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use SeattleWebCo\WPZoom\Cache;
 
 /**
@@ -13,7 +17,7 @@ use SeattleWebCo\WPZoom\Cache;
  * @return void
  */
 function wp_zoom_single_product_summary() {
-	global $webinars;
+	$webinars = isset( $GLOBALS['wp_zoom_webinars'] ) ? $GLOBALS['wp_zoom_webinars'] : array();
 
 	if ( ! empty( $webinars ) && is_array( $webinars ) ) {
 		?>
@@ -31,7 +35,7 @@ function wp_zoom_single_product_summary() {
 							$webinar,
 							array(
 								'name'     => esc_attr( '_wp_zoom_webinars_occurrences[' . $webinar['id'] . ']' ),
-								'selected' => array( intval( $_REQUEST['occurrence_id'] ?? 0 ) ),
+								'selected' => array( isset( $_REQUEST['occurrence_id'] ) ? absint( wp_unslash( $_REQUEST['occurrence_id'] ) ) : 0 ),
 							)
 						);
 						?>
@@ -70,17 +74,17 @@ add_filter( 'woocommerce_available_variation', 'wp_zoom_woocommerce_available_va
  * @return void
  */
 function wp_zoom_prepare_webinar_data( $post, $wp_query ) {
-	if ( $wp_query->is_main_query() && ! isset( $GLOBALS['webinars'] ) ) {
+	if ( $wp_query->is_main_query() && ! isset( $GLOBALS['wp_zoom_webinars'] ) ) {
 		$product = wc_get_product();
 
-		$GLOBALS['webinars'] = wp_zoom_get_webinars( $post );
+		$GLOBALS['wp_zoom_webinars'] = wp_zoom_get_webinars( $post );
 
 		if ( $product && is_a( $product, 'WC_Product_Grouped' ) ) {
 			foreach ( $product->get_children() as $child ) {
-				$GLOBALS['webinars'] = array_merge( $GLOBALS['webinars'], wp_zoom_get_webinars( $child ) );
+				$GLOBALS['wp_zoom_webinars'] = array_merge( $GLOBALS['wp_zoom_webinars'], wp_zoom_get_webinars( $child ) );
 			}
 
-			$GLOBALS['webinars'] = array_unique( $GLOBALS['webinars'], SORT_REGULAR );
+			$GLOBALS['wp_zoom_webinars'] = array_unique( $GLOBALS['wp_zoom_webinars'], SORT_REGULAR );
 		}
 	}
 }
@@ -285,7 +289,13 @@ add_action( 'woocommerce_checkout_create_order_line_item', 'wp_zoom_create_order
 function wp_zoom_payment_complete( $order_id, $from, $to, $order ) {
 	global $wp_zoom;
 
-	if ( ! in_array( $to, wc_get_is_paid_statuses(), true ) ) {
+	$register_on = wp_zoom_get_setting( 'register_on_status', 'paid' );
+
+	if ( 'paid' === $register_on ) {
+		if ( ! in_array( $to, wc_get_is_paid_statuses(), true ) ) {
+			return;
+		}
+	} elseif ( $to !== $register_on ) {
 		return;
 	}
 
@@ -329,15 +339,24 @@ function wp_zoom_payment_complete( $order_id, $from, $to, $order ) {
 				'email'            => $order->get_billing_email(),
 				'first_name'       => $order->get_billing_first_name(),
 				'last_name'        => $order->get_billing_last_name(),
-				'address'          => $order->get_billing_address_1(),
-				'city'             => $order->get_billing_city(),
-				'country'          => $order->get_billing_country(),
-				'zip'              => $order->get_billing_postcode(),
-				'state'            => $order->get_billing_state(),
-				'phone'            => $order->get_billing_phone(),
-				'org'              => $order->get_billing_company(),
 				'custom_questions' => $custom_questions,
 			);
+
+			$optional_fields = array(
+				'send_billing_address'  => array( 'address', $order->get_billing_address_1() ),
+				'send_billing_city'     => array( 'city', $order->get_billing_city() ),
+				'send_billing_state'    => array( 'state', $order->get_billing_state() ),
+				'send_billing_postcode' => array( 'zip', $order->get_billing_postcode() ),
+				'send_billing_country'  => array( 'country', $order->get_billing_country() ),
+				'send_billing_phone'    => array( 'phone', $order->get_billing_phone() ),
+				'send_billing_company'  => array( 'org', $order->get_billing_company() ),
+			);
+
+			foreach ( $optional_fields as $setting => $field ) {
+				if ( 'yes' === wp_zoom_get_setting( $setting ) && '' !== $field[1] ) {
+					$registrant_data[ $field[0] ] = $field[1];
+				}
+			}
 
 			$registration = $wp_zoom->add_webinar_registrant( $webinar_id, $registrant_data, $occurrence_id );
 
@@ -464,8 +483,11 @@ add_filter( 'woocommerce_checkout_fields', 'wp_zoom_woocommerce_checkout_fields'
  * @return void
  */
 function wp_zoom_woocommerce_checkout_update_order_meta( $order_id ) {
-	// phpcs:ignore
-	$custom_questions = array_map( 'wp_zoom_sanitize_recursive', $_POST['wp_zoom_webinars_custom_questions'] ?? array() );
+	$custom_questions = array();
+
+	if ( isset( $_POST['wp_zoom_webinars_custom_questions'] ) && is_array( $_POST['wp_zoom_webinars_custom_questions'] ) ) {
+		$custom_questions = map_deep( wp_unslash( $_POST['wp_zoom_webinars_custom_questions'] ), 'sanitize_text_field' );
+	}
 
 	// phpcs:ignore
 	if ( ! empty( $custom_questions ) ) {
@@ -650,8 +672,7 @@ function wp_zoom_woocommerce_list_after_info( $args ) {
 	if ( $args['product'] ) {
 		$product = wc_get_product( $args['product'] );
 
-		/* phpcs:ignore WordPress.Security.EscapeOutput */
-		printf( '<p class="wp-zoom-list-item--info-excerpt">%s</p>', $product->get_short_description() );
+		printf( '<p class="wp-zoom-list-item--info-excerpt">%s</p>', wp_kses_post( $product->get_short_description() ) );
 	}
 }
 add_action( 'wp_zoom_list_after_info', 'wp_zoom_woocommerce_list_after_info' );

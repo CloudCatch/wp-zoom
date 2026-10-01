@@ -7,8 +7,11 @@
 
 namespace SeattleWebCo\WPZoom;
 
-use League\OAuth2\Client\Provider\AbstractProvider;
-use League\OAuth2\Client\Token\AccessToken;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+use SeattleWebCo\WPZoom\AccessToken;
 
 /**
  * Api class.
@@ -26,7 +29,7 @@ class Api {
 
 	public $provider;
 
-	public function __construct( AbstractProvider $provider ) {
+	public function __construct( $provider ) {
 		$this->provider = $provider;
 
 		$this->user_id = get_option( 'wp_zoom_user_id', null );
@@ -149,7 +152,7 @@ class Api {
 	 * @param string       $occurrence_id The webinar occurrence if applicable.
 	 * @return array
 	 */
-	public function add_webinar_registrant( string $webinar_id, \WC_Customer $customer, string $occurrence_id = null ) {
+	public function add_webinar_registrant( string $webinar_id, \WC_Customer $customer, $occurrence_id = null ) {
 		$request = $this->provider->getAuthenticatedRequest(
 			'POST',
 			add_query_arg( array( 'occurrence_ids' => $occurrence_id ), $this->base_uri . '/webinars/' . $webinar_id . '/registrants' ),

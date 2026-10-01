@@ -8,6 +8,7 @@
 /.vscode
 /phpcs.xml
 /node_modules
+/vendor
 /tests
 /build
 /resources
@@ -53,3 +54,5 @@ postcss.config.js
 webpack.config.js
 webpack.gutenberg.config.js
 webpack.mix.js
+wp-esbuild.config.mjs
+*.asset.php

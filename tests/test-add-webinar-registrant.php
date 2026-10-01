@@ -5,6 +5,10 @@
  * @package SeattleWebCo\WPZoom
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Test adding registrant to webinar
  */
@@ -36,13 +40,11 @@ class TestAddWebinarRegistrant extends WP_UnitTestCase {
 		$wpdb->query( "DELETE FROM {$wpdb->prefix}woocommerce_order_items" );
 		$wpdb->query( "DELETE FROM {$wpdb->prefix}woocommerce_order_itemmeta" );
 
-		$provider = $this->getMockBuilder('\League\OAuth2\Client\Provider\GenericProvider')
-			->setConstructorArgs(array( array(
-				'urlAuthorize' => 'https://example.com',
-				'urlAccessToken' => 'https://example.com',
-				'urlResourceOwnerDetails' => 'https://example.com'
-			)))
-			->getMock();
+        $provider = new \SeattleWebCo\WPZoom\Provider\Zoom(
+			array(
+				'redirectUri' => 'https://example.com',
+			)
+		);
 		
 		
 		$GLOBALS['wp_zoom'] = $this->getMockBuilder('\SeattleWebCo\WPZoom\API')

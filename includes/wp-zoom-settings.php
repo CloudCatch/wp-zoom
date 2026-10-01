@@ -5,6 +5,10 @@
  * @package SeattleWebCo\WPZoom
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use SeattleWebCo\WPZoom\Cache;
 
 /**
@@ -65,9 +69,16 @@ function wp_zoom_options_page() {
 function wp_zoom_get_access_token() {
 	global $wp_zoom;
 
-    // phpcs:ignore
-	if ( ! isset( $_GET['state'] ) || ! isset( $_GET['code'] ) || ! isset( $_GET['page'] ) || $_GET['page'] !== 'wp-zoom' ) {
+	if ( ! isset( $_GET['state'], $_GET['code'], $_GET['page'] ) ) {
 		return;
+	}
+
+	if ( 'wp-zoom' !== sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
+		return;
+	}
+
+	if ( ! current_user_can( 'manage_options' ) || ! wp_zoom_verify_oauth_state() ) {
+		wp_die( esc_html__( 'Invalid authorization request. Please start the connection again from the settings screen.', 'wp-zoom' ) );
 	}
 
 	delete_option( 'wp_zoom_oauth_tokens' );
@@ -75,30 +86,26 @@ function wp_zoom_get_access_token() {
 
 	Cache::delete_all();
 
-    // phpcs:ignore
-	if ( ! empty( $_GET['state'] ) ) {
-		try {
-			$access_token = $wp_zoom->provider->getAccessToken(
-				'authorization_code',
-				array(
-                    // phpcs:ignore
-                    'code' => sanitize_text_field( $_GET['code'] ),
-				)
-			);
+	try {
+		$access_token = $wp_zoom->provider->getAccessToken(
+			'authorization_code',
+			array(
+				'code' => sanitize_text_field( wp_unslash( $_GET['code'] ) ),
+			)
+		);
 
-			$wp_zoom->update_access_token( $access_token );
+		$wp_zoom->update_access_token( $access_token );
 
-			$me = $wp_zoom->get_me();
+		$me = $wp_zoom->get_me();
 
-			if ( ! empty( $me['id'] ) ) {
-				update_option( 'wp_zoom_user_id', $me['id'] );
-			}
-
-			wp_safe_redirect( admin_url( 'options-general.php?page=wp-zoom' ) );
-			exit;
-		} catch ( \Exception $e ) {
-			wp_die( esc_html( $e->getMessage() ) );
+		if ( ! empty( $me['id'] ) ) {
+			update_option( 'wp_zoom_user_id', $me['id'] );
 		}
+
+		wp_safe_redirect( admin_url( 'options-general.php?page=wp-zoom' ) );
+		exit;
+	} catch ( \Exception $e ) {
+		wp_die( esc_html( $e->getMessage() ) );
 	}
 }
 add_action( 'wp_loaded', 'wp_zoom_get_access_token' );
@@ -109,13 +116,20 @@ add_action( 'wp_loaded', 'wp_zoom_get_access_token' );
  * @return void
  */
 function wp_zoom_revoke_authorization() {
+	global $wp_zoom;
+
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_die( esc_html__( 'You do not have permission to do that.', 'wp-zoom' ) );
 	}
 
-    // phpcs:ignore
-    if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'] ?? '', 'wp-zoom-revoke' ) ) {
+	if ( ! wp_zoom_verify_request_nonce( 'wp-zoom-revoke' ) ) {
 		wp_die( esc_html__( 'Invalid nonce, please try again.', 'wp-zoom' ) );
+	}
+
+	$tokens = get_option( 'wp_zoom_oauth_tokens', array() );
+
+	if ( ! empty( $tokens['access_token'] ) && isset( $wp_zoom->provider ) ) {
+		$wp_zoom->provider->revoke( $tokens['access_token'] );
 	}
 
 	delete_option( 'wp_zoom_oauth_tokens' );
@@ -142,8 +156,7 @@ function wp_zoom_purge_cache() {
 		wp_die( esc_html__( 'You do not have permission to do that.', 'wp-zoom' ) );
 	}
 
-    // phpcs:ignore
-    if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'] ?? '', 'wp-zoom-purge-cache' ) ) {
+	if ( ! wp_zoom_verify_request_nonce( 'wp-zoom-purge-cache' ) ) {
 		wp_die( esc_html__( 'Invalid nonce, please try again.', 'wp-zoom' ) );
 	}
 
@@ -172,20 +185,26 @@ add_action( 'admin_init', 'wp_zoom_purge_cache' );
 function wp_zoom_save_tokens() {
 	global $wp_zoom;
 
-    // phpcs:ignore
-	if ( ! isset( $_GET['wp_zoom_tokens'] ) || ! isset( $_GET['page'] ) || $_GET['page'] !== 'wp-zoom' ) {
+	if ( ! isset( $_GET['wp_zoom_tokens'], $_GET['page'] ) ) {
 		return;
 	}
 
-	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( esc_html__( 'You do not have permission to do that.', 'wp-zoom' ) );
+	if ( 'wp-zoom' !== sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
+		return;
 	}
 
-    // phpcs:ignore
-    $tokens = wp_zoom_sanitize_recursive( $_GET['wp_zoom_tokens'] );
+	if ( ! current_user_can( 'manage_options' ) || ! wp_zoom_verify_oauth_state() ) {
+		wp_die( esc_html__( 'Invalid authorization request. Please start the connection again from the settings screen.', 'wp-zoom' ) );
+	}
+
+	$tokens = sanitize_text_field( wp_unslash( $_GET['wp_zoom_tokens'] ) );
 
 	if ( $tokens ) {
-		$tokens = json_decode( json_decode( stripslashes( $tokens ) ), true );
+		$tokens = json_decode( $tokens, true );
+
+		if ( is_string( $tokens ) ) {
+			$tokens = json_decode( $tokens, true );
+		}
 
 		if ( isset( $tokens['access_token'] ) ) {
 			$wp_zoom->update_access_token( $tokens );
@@ -256,9 +275,26 @@ function wp_zoom_render_settings_field( $field, $args ) {
 					);
 					break;
 
+				case 'select':
+					printf( '<select name="wp_zoom_settings[%1$s]" id="%1$s">', esc_attr( $field ) );
+					foreach ( (array) $args['options'] as $option => $label ) {
+						printf(
+							'<option value="%1$s" %2$s>%3$s</option>',
+							esc_attr( $option ),
+							selected( (string) $value, (string) $option, false ),
+							esc_html( $label )
+						);
+					}
+					echo '</select>';
+					break;
+
 				case 'text':
 				default:
 					printf( '<input type="text" name="wp_zoom_settings[%1$s]" id="%1$s" value="%2$s" />', esc_attr( $field ), esc_attr( $value ) );
+			}
+
+			if ( ! empty( $args['description'] ) ) {
+				printf( '<p class="description">%s</p>', esc_html( $args['description'] ) );
 			}
 			?>
 		</td>
@@ -277,15 +313,72 @@ function wp_zoom_get_settings_fields( $tab = '' ) {
 	$fields = apply_filters(
 		'wp_zoom_settings_fields',
 		array(
-			'general'      => array(),
+			'general'      => array(
+				'enable_logging' => array(
+					'label'       => esc_html__( 'Logging', 'wp-zoom' ),
+					'type'        => 'checkbox',
+					'cb_label'    => esc_html__( 'Write Zoom API errors to the uploads directory', 'wp-zoom' ),
+					'description' => esc_html__( 'Logs are stored in uploads/wp-zoom-logs and removed after 14 days.', 'wp-zoom' ),
+					'sanitize_cb' => 'wp_zoom_sanitize_checkbox_setting',
+				),
+			),
 			'registration' => array(
+				'register_on_status'                => array(
+					'label'       => esc_html__( 'Register customer', 'wp-zoom' ),
+					'type'        => 'select',
+					'default'     => 'paid',
+					'options'     => wp_zoom_register_on_status_options(),
+					'description' => esc_html__( 'Choose when a paid order should register the customer for the webinar.', 'wp-zoom' ),
+					'sanitize_cb' => 'wp_zoom_sanitize_register_on_status',
+				),
 				'hide_webinar_occurrences_disabled' => array(
-					'label'       => esc_html__( 'Status', 'wp-zoom' ),
+					'label'       => esc_html__( 'Occurrences', 'wp-zoom' ),
 					'type'        => 'checkbox',
 					'cb_label'    => esc_html__( 'Hide webinar occurrences unavailable for registration', 'wp-zoom' ),
-					'sanitize_cb' => function( $value ) {
-						return 'yes' === $value ? 'yes' : '';
-					},
+					'sanitize_cb' => 'wp_zoom_sanitize_checkbox_setting',
+				),
+				'send_billing_address'              => array(
+					'label'       => esc_html__( 'Customer details', 'wp-zoom' ),
+					'type'        => 'checkbox',
+					'cb_label'    => esc_html__( 'Street address', 'wp-zoom' ),
+					'description' => esc_html__( 'Email and name are always sent to Zoom. These fields are sent only when checked.', 'wp-zoom' ),
+					'sanitize_cb' => 'wp_zoom_sanitize_checkbox_setting',
+				),
+				'send_billing_city'                 => array(
+					'label'       => '',
+					'type'        => 'checkbox',
+					'cb_label'    => esc_html__( 'City', 'wp-zoom' ),
+					'sanitize_cb' => 'wp_zoom_sanitize_checkbox_setting',
+				),
+				'send_billing_state'                => array(
+					'label'       => '',
+					'type'        => 'checkbox',
+					'cb_label'    => esc_html__( 'State', 'wp-zoom' ),
+					'sanitize_cb' => 'wp_zoom_sanitize_checkbox_setting',
+				),
+				'send_billing_postcode'             => array(
+					'label'       => '',
+					'type'        => 'checkbox',
+					'cb_label'    => esc_html__( 'Postal code', 'wp-zoom' ),
+					'sanitize_cb' => 'wp_zoom_sanitize_checkbox_setting',
+				),
+				'send_billing_country'              => array(
+					'label'       => '',
+					'type'        => 'checkbox',
+					'cb_label'    => esc_html__( 'Country', 'wp-zoom' ),
+					'sanitize_cb' => 'wp_zoom_sanitize_checkbox_setting',
+				),
+				'send_billing_phone'                => array(
+					'label'       => '',
+					'type'        => 'checkbox',
+					'cb_label'    => esc_html__( 'Phone', 'wp-zoom' ),
+					'sanitize_cb' => 'wp_zoom_sanitize_checkbox_setting',
+				),
+				'send_billing_company'              => array(
+					'label'       => '',
+					'type'        => 'checkbox',
+					'cb_label'    => esc_html__( 'Company', 'wp-zoom' ),
+					'sanitize_cb' => 'wp_zoom_sanitize_checkbox_setting',
 				),
 			),
 		)
@@ -304,8 +397,7 @@ function wp_zoom_get_settings_fields( $tab = '' ) {
  * @return void
  */
 function wp_zoom_settings_save() {
-	// phpcs:ignore
-	if ( ! wp_verify_nonce( $_REQUEST['_wpnonce'] ?? '', 'wp-zoom-settings' ) ) {
+	if ( ! wp_zoom_verify_request_nonce( 'wp-zoom-settings' ) ) {
 		wp_die( esc_html__( 'Invalid nonce, please try again.', 'wp-zoom' ) );
 	}
 
@@ -321,7 +413,13 @@ function wp_zoom_settings_save() {
 	$updated_settings = get_option( 'wp_zoom_settings', array() );
 
 	foreach ( $settings_fields as $field => $args ) {
-		$updated_settings[ $field ] = sanitize_text_field( wp_unslash( $_REQUEST['wp_zoom_settings'][ $field ] ?? '' ) );
+		$raw = wp_unslash( $_REQUEST['wp_zoom_settings'][ $field ] ?? '' );
+
+		if ( isset( $args['sanitize_cb'] ) && is_callable( $args['sanitize_cb'] ) ) {
+			$updated_settings[ $field ] = call_user_func( $args['sanitize_cb'], $raw );
+		} else {
+			$updated_settings[ $field ] = sanitize_text_field( $raw );
+		}
 	}
 
 	update_option( 'wp_zoom_settings', $updated_settings );
@@ -330,3 +428,62 @@ function wp_zoom_settings_save() {
 	exit;
 }
 add_action( 'admin_post_wp_zoom_settings', 'wp_zoom_settings_save' );
+
+/**
+ * Read one plugin setting.
+ *
+ * @param string $key Setting key.
+ * @param string $default Value when the setting has not been saved.
+ * @return string
+ */
+function wp_zoom_get_setting( $key, $default = '' ) {
+	$settings = (array) get_option( 'wp_zoom_settings', array() );
+
+	if ( ! array_key_exists( $key, $settings ) || '' === $settings[ $key ] ) {
+		return $default;
+	}
+
+	return (string) $settings[ $key ];
+}
+
+/**
+ * Store a checkbox as yes or an empty string.
+ *
+ * @param mixed $value Submitted value.
+ * @return string
+ */
+function wp_zoom_sanitize_checkbox_setting( $value ) {
+	return 'yes' === $value ? 'yes' : '';
+}
+
+/**
+ * Order statuses that can trigger webinar registration.
+ *
+ * @return array
+ */
+function wp_zoom_register_on_status_options() {
+	$options = array(
+		'paid' => esc_html__( 'When the order is paid', 'wp-zoom' ),
+	);
+
+	if ( function_exists( 'wc_get_order_statuses' ) ) {
+		foreach ( wc_get_order_statuses() as $status => $label ) {
+			$options[ preg_replace( '/^wc-/', '', $status ) ] = $label;
+		}
+	}
+
+	return $options;
+}
+
+/**
+ * Keep only a known order-status choice.
+ *
+ * @param mixed $value Submitted value.
+ * @return string
+ */
+function wp_zoom_sanitize_register_on_status( $value ) {
+	$value   = sanitize_key( $value );
+	$options = wp_zoom_register_on_status_options();
+
+	return array_key_exists( $value, $options ) ? $value : 'paid';
+}

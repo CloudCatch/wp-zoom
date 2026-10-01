@@ -1,0 +1,12 @@
+@font-face {
+	font-family: wp-zoom;
+	src: url("../fonts/wp-zoom.eot?94z1gq");
+	src:
+		url("../fonts/wp-zoom.eot?94z1gq#iefix") format("embedded-opentype"),
+		url("../fonts/wp-zoom.ttf?94z1gq") format("truetype"),
+		url("../fonts/wp-zoom.woff?94z1gq") format("woff"),
+		url("../fonts/wp-zoom.svg?94z1gq#wp-zoom") format("svg");
+	font-weight: 400;
+	font-style: normal;
+	font-display: block;
+}
