@@ -23,7 +23,7 @@
   "scripts": {
     "build": "NODE_ENV=production wp-esbuild",
     "start": "wp-esbuild --watch",
-    "i18n": "wp i18n make-pot . languages/wp-zoom.pot --slug=wp-zoom --domain=wp-zoom --exclude=node_modules,tests,vendor,build",
+    "i18n": "wp i18n make-pot . languages/wp-zoom.pot --slug=wp-zoom --domain=wp-zoom --exclude=node_modules,tests,vendor,build,assets",
     "package": "./bin/build-zip.sh"
   }
 }
