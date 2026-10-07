@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:     Zoom for WordPress
+ * Plugin Name:     WP Events for Zoom
  * Description:     Simple Zoom integration with WordPress makes anything possible
  * Version:         0.0.0-development
  * Author:          CloudCatch LLC
