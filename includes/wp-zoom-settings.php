@@ -17,7 +17,7 @@ use SeattleWebCo\WPZoom\Cache;
  * @return void
  */
 function wp_zoom_admin_menu() {
-	add_options_page( esc_html__( 'Zoom for WordPress', 'wp-zoom' ), esc_html__( 'Zoom for WordPress', 'wp-zoom' ), 'manage_options', 'wp-zoom', 'wp_zoom_options_page' );
+	add_options_page( esc_html__( 'WP Events for Zoom', 'wp-zoom' ), esc_html__( 'WP Events for Zoom', 'wp-zoom' ), 'manage_options', 'wp-zoom', 'wp_zoom_options_page' );
 }
 add_action( 'admin_menu', 'wp_zoom_admin_menu' );
 
@@ -32,7 +32,7 @@ function wp_zoom_options_page() {
 	?>
 
 	<div class="wrap">
-		<h1><?php esc_html_e( 'Zoom for WordPress', 'wp-zoom' ); ?></h1>
+		<h1><?php esc_html_e( 'WP Events for Zoom', 'wp-zoom' ); ?></h1>
 
 		<div class="wp-zoom-tabs">
 			<a href="<?php echo esc_url( add_query_arg( array( 'tab' => 'general' ), admin_url( 'options-general.php?page=wp-zoom' ) ) ); ?>" class="wp-zoom-tab <?php echo esc_attr( $tab === 'general' ? 'active' : '' ); ?>">
