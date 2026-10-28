@@ -1,3 +1,3 @@
-# WP Events for Zoom
+# Webinar Checkout for Zoom
 
-Simple Zoom integration with WordPress makes anything possible + WordPress
+Sell Zoom webinars in WooCommerce and register buyers at checkout. List webinars and meetings from the connected Zoom account.

@@ -1,7 +1,7 @@
 {
   "name": "wp-zoom",
   "version": "0.0.0-development",
-  "description": "Simple Zoom integration with WordPress makes anything possible",
+  "description": "Sell Zoom webinars in WooCommerce and register buyers at checkout. List webinars and meetings from the connected account.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CloudCatch/wp-zoom.git"

@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name:     WP Events for Zoom
- * Description:     Simple Zoom integration with WordPress makes anything possible
+ * Plugin Name:     Webinar Checkout for Zoom
+ * Description:     Sell Zoom webinars in WooCommerce and register buyers at checkout. List webinars and meetings from the connected account.
  * Version:         0.0.0-development
  * Author:          CloudCatch LLC
  * Author URI:      https://cloudcatch.io

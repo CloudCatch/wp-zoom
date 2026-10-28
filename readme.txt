@@ -1,4 +1,4 @@
-=== WP Events for Zoom ===
+=== Webinar Checkout for Zoom ===
 Contributors: cloudcatch, dkjensen
 Tags: zoom,webinars,meetings,woocommerce
 Requires at least: 5.4
@@ -8,12 +8,17 @@ Stable tag: 0.0.0-development
 License: GPL-3.0
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Sell, display, register users for webinars with WP Events for Zoom
+Sell Zoom webinars in WooCommerce and register buyers at checkout. List webinars and meetings from the connected account.
 
 == Description ==
-WP Events for Zoom has a native WooCommerce integration, allowing you to sell webinars and register users automatically when completing checkout.
 
-This plugin integrates with the Zoom API located at https://api.zoom.us/v2
+Connect one Zoom user from **Settings → Zoom Webinars**. The site lists webinars and meetings hosted by that user.
+
+Attach a webinar to a virtual WooCommerce product. On a recurring webinar with fixed times, the buyer picks a date before checkout. When the order is paid, the buyer is registered for that webinar. You can register on another order status instead. Email and name are always sent to Zoom. Street address, city, state, postal code, country, phone, and company are sent only when those settings are turned on. Custom questions from the webinar are shown at checkout.
+
+Use `[wp-zoom-list]` for upcoming webinars, `[wp-zoom-list type="meetings"]` for meetings, and `[wp-zoom-calendar]` for a webinar calendar. Meetings are listed only. Checkout does not register anyone for a meeting.
+
+Listing and selling webinars requires a Zoom Webinar license on the connected user.
 
 
 == Installation ==
@@ -24,7 +29,7 @@ This plugin integrates with the Zoom API located at https://api.zoom.us/v2
 * MySQL 5.6 or greater is recommended
 
 1. Install and activate the plugin.
-2. In WordPress, open **Settings → WP Events for Zoom**.
+2. In WordPress, open **Settings → Zoom Webinars**.
 3. Click the Zoom button and approve access. The site connects through the CloudCatch connector at `https://oauth.cloudcatch.io`. You do not need to create a Zoom app for this path.
 
 = Optional: use your own Zoom app =
@@ -35,7 +40,7 @@ Define `WP_ZOOM_CLIENT_ID` and `WP_ZOOM_CLIENT_SECRET` in **wp-config.php** to s
 2. Set the redirect URL and the allow list to your site's `/wp-admin/options-general.php?page=wp-zoom`.
 3. Add these scopes: **user:read**, **webinar:read**, **webinar:write**, **meeting:read**.
 4. Put the app's client id and secret in the constants above.
-5. Open **Settings → WP Events for Zoom** and authorize.
+5. Open **Settings → Zoom Webinars** and authorize.
 
 == External services ==
 
